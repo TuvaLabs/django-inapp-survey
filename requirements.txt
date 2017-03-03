@@ -1,0 +1,6 @@
+--allow-all-external
+
+Django==1.9.9
+djangorestframework==3.4.6
+django-extensions==1.6.7
+mysql-python
