@@ -57,7 +57,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['/Users/Jaimin/Apps/opensource/django-inapp-survey/mysite/templates/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -12,5 +12,4 @@ urlpatterns = [
         name='active-campaign-details'),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
-    url(r'^$', views.index, name="index"),
 ]
