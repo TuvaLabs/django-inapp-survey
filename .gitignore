@@ -78,6 +78,9 @@ celerybeat-schedule
 # dotenv
 .env
 
+# static
+bower_components
+
 # virtualenv
 venv/
 ENV/
