@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+
+    {{ block.super }}
+
+{% endblock %}
+
+{% block extrastyle %}
+
+    {{ block.super }}
+    <script src="/static/bower_components/jquery/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+    <!-- Polymer Components -->
+    <script src="/static/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="/static/markdown-delight-editor/markdown-delight-editor-extended.html">
+
+    <style type="text/css">
+    /*to avoid texteditor coming on top of the label*/
+    .aligned label{
+        float: none;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+{% endblock %}

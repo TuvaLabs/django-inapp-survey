@@ -1,0 +1,221 @@
+<link rel="import" href="/static/bower_components/polymer/polymer.html">
+<link rel="import" href="/static/bower_components/markdown-delight-editor/markdown-delight-editor.html">
+<script src="/static/javascript/extended-markdown.js"></script>
+
+<dom-module id="markdown-delight-editor-extended">
+    <template>
+    <style>
+    :host {
+        display: block;
+    }
+    ::content p {
+        margin: 1em 0 !important;
+        padding: 0 !important;
+    }
+    ::content h1 {
+        margin: 0.67em 0 !important;
+        font-size: 2em;
+    }
+    ::content h2 {
+        margin: 0.83em 0 !important;
+        font-size: 1.5em;
+    }
+    ::content h3 {
+        margin: 1em 0 !important;
+        font-size: 1.17em;
+    }
+    ::content h4 {
+        margin: 1.33em 0 !important;
+    }
+    ::content h5 {
+        margin: 1.67em 0 !important;
+        font-size: 0.83em;
+    }
+    ::content h6 {
+        margin: 2.33em 0 !important;
+        font-size: 0.67em;
+    }
+    ::content ul, ::content ol {
+        margin: 1em 0 !important;
+        padding: 0 0 0 40px;
+    }
+    </style>
+    <markdown-delight-editor extension="extended">
+        <ul>
+            <li><a class="fa fa-file-image-o" on-tap="handleImage" title="Image with custom width and height"></a></li>
+            <li><a class="fa fa-youtube-play" on-tap="handleYoutube" title="Embed YouTube Video"></a></li>
+            <li><a class="fa fa-vimeo" on-tap="handleVimeo" title="Embed Vimeo Video"></a></li>
+        </ul>
+        <ul>
+            <li><a class="fa fa-hand-paper-o" on-tap="handleAlert" title="Alert"></a></li>
+            <li><a class="fa fa-object-group" on-tap="handleContentArea" title="Bordered Content Area/Answer"></a></li>
+        </ul>
+        <ul>
+            <li><a class="fa fa-text-height" on-tap="handleQuestionText" title="Textbox"></a></li>
+            <li><a class="fa fa-dot-circle-o" on-tap="handleQuestionRadio" title="Radio Button"></a></li>
+            <li><a class="fa fa-check-square-o" on-tap="handleQuestionCheckbox" title="Check Box"></a></li>
+        </ul>
+        <ul>
+            <li><a class="fa fa-level-down" on-tap="handleBreak" title="Break to Next Line"></a></li>
+            <li><a class="fa fa-subscript" on-tap="handleSubscript" title="Subscript"></a></li>
+            <li><a class="fa fa-superscript" on-tap="handleSuperscript" title="Superscript"></a></li>
+        </ul>
+        <textarea name="{{name}}"></textarea>
+    </markdown-delight-editor>
+</template>
+<script>
+(function () {
+    // register a new element
+    Polymer({
+        is: "markdown-delight-editor-extended",
+        created: function(){
+            this.markedText = "";
+            // TODO: To fix the initialization unwanted text issue,
+            // can't think of better solution than manual check, its not clean
+            if ( this.textContent &&
+                this.textContent != "None" &&
+                $.trim(this.textContent).indexOf('xxxxxxxx') < 0 ){
+                    this.markedText = $.trim(this.textContent);
+            }
+        },
+        properties: {
+            name: String
+        },
+        ready: function() {
+            this.$$('textarea').value = this.markedText;
+            this.mde = this.querySelector('markdown-delight-editor');
+        },
+        handleYoutube: function() {
+            this.mde.replaceSelection("!![youtube][560x315](YOUTUBE_ID)");
+        },
+        handleVimeo: function() {
+            this.mde.replaceSelection("!![vimeo][560x315](VIMEO_ID)");
+        },
+        handleImage: function() {
+            var formFields = [{
+                name: 'Image URL',
+                id: 'id_image_url',
+                type: 'text'
+            },{
+                name: 'Alt Text',
+                id: 'id_alt_text',
+                type: 'text'
+            },{
+                name: 'Caption',
+                id: 'id_image_caption',
+                type: 'text'
+            },{
+                name: 'Image Width',
+                value: '320',
+                id: 'id_image_width',
+                type: 'radio',
+                options: [{
+                    value: '320',
+                    display: '320'
+                },{
+                    value: '530',
+                    display: '530'
+                },{
+                    value: '-1',
+                    display: 'Custom Width'
+                }]
+            },{
+                name: 'Align',
+                id: 'id_image_align',
+                value: 'm',
+                type: 'radio',
+                options: [{
+                    value: 'l',
+                    display: 'Left'
+                },{
+                    value: 'm',
+                    display: 'Middle'
+                },{
+                    value: 'r',
+                    display: 'Right'
+                }]
+            },{
+                name: 'Custom Width',
+                id: 'id_image_width_custom',
+                type: 'text'
+            }];
+
+            var mde = this.mde;
+
+            mde.showModalForm(formFields, function(result){
+                if(result['id_image_url']) {
+                    var width = result['id_image_width'] !== "-1"? result['id_image_width']: result['id_image_width_custom'];
+                    if(result['id_image_align'] && result['id_image_align'] != 'm') {
+                        width += ":" + result['id_image_align'];
+                    }
+                    mde.replaceSelection("![" + result['id_alt_text'] + "][" + width + "](" + result['id_image_url'] + " \"" + result['id_image_caption'] + "\")");
+                }
+            });
+        },
+        handleAlert: function() {
+            this.mde.replaceSelection("[---\r\nMESSAGE_TEXT\r\n---] {alert-hand}");
+        },
+        handleContentArea: function() {
+            var formFields = [{
+                name: 'Border Color',
+                value: '#008000',
+                id: 'id_border_color',
+                type: 'text'
+            },{
+                name: 'Text Align',
+                value: 'left',
+                id: 'id_text_align',
+                type: 'radio',
+                options: [{
+                    value: 'left',
+                    display: 'Left'
+                },{
+                    value: 'center',
+                    display: 'Center'
+                },{
+                    value: 'right',
+                    display: 'Right'
+                }]
+            }];
+
+            var mde = this.mde;
+
+            mde.showModalForm(formFields, function(result){
+                var textToReplace = "!---\r\nPLACE YOUR TEXT HERE\r\n---!";
+                var styles = "";
+                if(result['id_border_color']) {
+                    styles += 'border-color:' + result['id_border_color'] + ';';
+                }
+                if(result['id_text_align']) {
+                    styles += 'text-align:' + result['id_text_align'] + ';';
+                }
+                if(styles) {
+                    textToReplace += "{" + styles + "}";
+                }
+                mde.replaceSelection(textToReplace);
+            });
+        },
+        handleQuestionText: function() {
+            this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=_");
+        },
+        handleQuestionRadio: function() {
+            this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=() {1}\r\n() OPTION 1\r\n() OPTION 2\r\n");
+        },
+        handleQuestionCheckbox: function() {
+            this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=[] {1,2}\r\n[] OPTION 1\r\n[] OPTION 2\r\n[] OPTION 3\r\n");
+        },
+        handleBreak: function() {
+            this.mde.replaceSelection(";;br");
+        },
+        handleSubscript: function() {
+            var val = this.mde.getSelection() || "";
+            this.mde.replaceSelection('^^' + val + '^^', true);
+        },
+        handleSuperscript: function() {
+            var val = this.mde.getSelection() || "";
+            this.mde.replaceSelection('^' + val + '^', true);
+        }
+    });
+})();
+</script>
+</dom-module>

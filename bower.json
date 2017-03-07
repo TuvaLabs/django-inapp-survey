@@ -23,6 +23,7 @@
     "tests"
   ],
   "dependencies": {
+    "jquery": "1.7.2",
     "polymer": "Polymer/polymer#^1.4.0",
     "codemirror": "CodeMirror#5.13.2",
     "components-font-awesome": "^4.5.0",
