@@ -18,12 +18,10 @@ class CampaignCustomParam(TimeStampedModel):
     # page: Dataset, Course
 
     param_key  = models.CharField(
-        default=False,
         null=False,
         blank=False,
         max_length=200)
     param_value  = models.CharField(
-        default=False,
         null=False,
         blank=False,
         max_length=1000)
