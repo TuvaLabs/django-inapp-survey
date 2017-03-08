@@ -42,7 +42,7 @@ class CampaignQuestionSerializer(serializers.ModelSerializer):
 
 class CampaignSerializer(serializers.ModelSerializer):
 
-        custom_params = CampaignCustomParamSerializer(
+        custom_param = CampaignCustomParamSerializer(
             many=True, read_only=True)
 
         steps = CampaignQuestionSerializer(
@@ -59,6 +59,6 @@ class CampaignSerializer(serializers.ModelSerializer):
                 'expiry_date',
                 'campaign_type',
                 'steps',
-                'custom_params'
+                'custom_param'
             )
 
