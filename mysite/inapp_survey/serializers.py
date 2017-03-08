@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from inapp_survey.models import Campaign, CampaignCustomParam, \
-    CampaignQuestion
+from .models import Campaign, CampaignCustomParam, \
+    CampaignQuestion, UserCampaign
 
 
 class CampaignCustomParamSerializer(serializers.ModelSerializer):
@@ -62,3 +62,21 @@ class CampaignSerializer(serializers.ModelSerializer):
                 'custom_param'
             )
 
+
+class UserCampaignSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserCampaign
+        fields = (
+            'id',
+            'user',
+            'campaign',
+            'is_completed',
+        )
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=UserCampaign.objects.all(),
+                fields=('user', 'campaign')
+            )
+        ]
