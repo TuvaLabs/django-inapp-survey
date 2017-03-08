@@ -11,7 +11,6 @@ from inapp_survey.serializers import CampaignSerializer, \
 # param - will need to return based on that the first one.
 class ActiveCampaignList(views.APIView):
 
-    # If its expired, don't return
     # query string param match
     # Only return the first one.
     permission_classes = [
@@ -20,11 +19,41 @@ class ActiveCampaignList(views.APIView):
 
     def get(self, request, *args, **kwargs):
 
-        campaign = Campaign.objects.filter(expiry_date__gt=datetime.now()).order_by('expiry_date').first()
-        # restrictions - expiry date is already applied
-        # is_authenticated
-        #
-        serializers = CampaignSerializer(campaign)
+        # If its expired, don't return
+        campaign = Campaign.objects.filter(expiry_date__gt=datetime.now()).order_by('expiry_date')
+
+        # check for is_authenticated
+        if request.user.is_authenticated():
+
+            exclude_responded = []
+            for item in campaign:
+                if item.usercampaign_set.filter(
+                    user=request.user,
+                    is_completed=True).exists():
+                    exclude_responded.append(item.id)
+
+            # exclude the one which is already completed by user
+            campaign = campaign.exclude(id__in=exclude_responded)
+        else:
+            campaign = campaign.filter(is_authenticated=False)
+
+
+        # check for custom_param filtering
+        user_param = {'user_type': 'teacher, student', 'page': 'dataset'}
+        filter_based_on_param = []
+
+        for item in campaign:
+            for param in item.custom_param.all():
+                if user_param.has_key(param.param_key) and param.param_value in user_param[param.param_key]:
+                    pass
+                else:
+                    filter_based_on_param.append(item.id)
+                    break
+
+        campaign = campaign.exclude(id__in=filter_based_on_param)
+
+
+        serializers = CampaignSerializer(campaign.first())
         return Response(serializers.data)
 
 
@@ -44,6 +73,20 @@ class UserCampaignList(generics.ListCreateAPIView):
         obj.user = self.request.user
 
 
+class UserCampaignDetail(generics.RetrieveUpdateDestroyAPIView):
+    '''
+    Retrieve, update or delete a board instance
+    '''
+
+    model = UserCampaign
+    serializer_class = UserCampaignSerializer
+    queryset = UserCampaign.objects.all()
+    lookup_field = 'pk'
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+    )
+
+
 class ActiveCampaignDetails(generics.RetrieveAPIView):
     """Get the campaign details"""
 
@@ -58,9 +101,6 @@ class ActiveCampaignDetails(generics.RetrieveAPIView):
     # define the post call here
 
 
-# if user is not enrolled and close the campaign, save the praference locally
-# for that slug
-
-
-# resource to make user campaign
 # resource to make user campaign answers
+UserCampaign, Response
+

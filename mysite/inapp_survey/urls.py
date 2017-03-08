@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 
 from . import views
 from inapp_survey.resources import ActiveCampaignList, ActiveCampaignDetails, \
-    UserCampaignList
+    UserCampaignList, UserCampaignDetail
 
 urlpatterns = [
     # TODO: only return the relevent
@@ -15,6 +15,9 @@ urlpatterns = [
     url(r'^/api/enroll/$',
         UserCampaignList.as_view(
             ), name='campaign-enroll-list'),
+    url(r'^/api/enroll/(?P<pk>\d+)/$',
+        UserCampaignDetail.as_view(
+            ), name='campaign-enroll-details'),
 
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),

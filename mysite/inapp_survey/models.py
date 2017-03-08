@@ -101,7 +101,7 @@ class UserCampaign(TimeStampedModel):
 
     def __unicode__(self):
         return u'%s-%s' % (
-            self.campaing,
+            self.campaign,
             self.user)
 
 

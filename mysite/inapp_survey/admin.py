@@ -59,6 +59,7 @@ class CampaignAdmin(admin.ModelAdmin):
         "created",
         "campaign_type",
         "expiry_date",
+        "is_authenticated",
     )
     inlines = [CampaignQuestionInline]
     prepopulated_fields = { "slug": ["title"] }
