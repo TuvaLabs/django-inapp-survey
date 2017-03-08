@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Campaign, CampaignCustomParam, \
-    CampaignQuestion, UserCampaign
+    CampaignQuestion, UserCampaign, UserCampaignResponse
 
 
 class CampaignCustomParamSerializer(serializers.ModelSerializer):
@@ -63,7 +63,26 @@ class CampaignSerializer(serializers.ModelSerializer):
             )
 
 
+# User Campaign Responses
+class UserCampaignResponseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserCampaignResponse
+
+        # To handle the unique entry per user_campaing and question
+        validators = [
+            UniqueTogetherValidator(
+                queryset=UserCampaignResponse.objects.all(),
+                fields=('user_campaign', 'question')
+            )
+        ]
+
+
 class UserCampaignSerializer(serializers.ModelSerializer):
+
+    answers = UserCampaignResponseSerializer(
+            source='usercampaignresponse_set',
+            many=True)
 
     class Meta:
         model = UserCampaign
@@ -72,6 +91,7 @@ class UserCampaignSerializer(serializers.ModelSerializer):
             'user',
             'campaign',
             'is_completed',
+            'answers',
         )
 
         validators = [
@@ -80,3 +100,4 @@ class UserCampaignSerializer(serializers.ModelSerializer):
                 fields=('user', 'campaign')
             )
         ]
+
