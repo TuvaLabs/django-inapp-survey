@@ -12,10 +12,10 @@ urlpatterns = [
     url(r'^/api/campaigns/(?P<slug>[0-9a-zA-Z_-]+)$',
         ActiveCampaignDetails.as_view(),
         name='active-campaign-details'),
-    url(r'^/api/enroll/$',
+    url(r'^/api/response/$',
         UserCampaignList.as_view(
             ), name='campaign-enroll-list'),
-    url(r'^/api/enroll/(?P<pk>\d+)/$',
+    url(r'^/api/response/(?P<pk>\d+)/$',
         UserCampaignDetail.as_view(
             ), name='campaign-enroll-details'),
 
