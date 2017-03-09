@@ -98,6 +98,7 @@ class UserCampaign(TimeStampedModel):
         User)
     campaign = models.ForeignKey(Campaign)
     is_completed = models.BooleanField(default=False)
+    is_canceled = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'%s-%s' % (

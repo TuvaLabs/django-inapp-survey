@@ -91,6 +91,7 @@ class UserCampaignSerializer(serializers.ModelSerializer):
             'user',
             'campaign',
             'is_completed',
+            'is_canceled',
             'answers',
         )
 
