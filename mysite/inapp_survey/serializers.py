@@ -20,6 +20,7 @@ class CampaignListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Campaign
         fields = (
+            'id',
             'title',
             'slug',
             'description',
@@ -52,6 +53,7 @@ class CampaignSerializer(serializers.ModelSerializer):
         class Meta:
             model = Campaign
             fields = (
+                'id',
                 'title',
                 'slug',
                 'description',
@@ -68,21 +70,38 @@ class UserCampaignResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserCampaignResponse
+        exclude = ( 'user_campaign', )
 
         # To handle the unique entry per user_campaing and question
-        validators = [
-            UniqueTogetherValidator(
-                queryset=UserCampaignResponse.objects.all(),
-                fields=('user_campaign', 'question')
-            )
-        ]
+        # validators = [
+        #     UniqueTogetherValidator(
+        #         queryset=UserCampaignResponse.objects.all(),
+        #         fields=('user_campaign', 'question')
+        #     )
+        # ]
 
 
 class UserCampaignSerializer(serializers.ModelSerializer):
 
     answers = UserCampaignResponseSerializer(
             source='usercampaignresponse_set',
-            many=True)
+            many=True,
+            required=False)
+
+    # While doing default save, we run into the issue because
+    # user_campaign is not available for the nested responses
+    # serializer
+    def create(self, validated_data):
+        # import pdb;pdb.set_trace()
+        answer_data = validated_data.pop('usercampaignresponse_set')
+        usercampaign_post = UserCampaign.objects.create(**validated_data)
+
+        for post in answer_data:
+            e = UserCampaignResponse.objects.create(
+                user_campaign=usercampaign_post, **post)
+
+        return usercampaign_post
+
 
     class Meta:
         model = UserCampaign

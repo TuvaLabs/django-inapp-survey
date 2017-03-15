@@ -113,7 +113,6 @@ class UserCampaignResponse(TimeStampedModel):
     response = models.TextField(
         null=True,
         blank=True)
-    attempt = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'%s-%s' % (

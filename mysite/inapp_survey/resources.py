@@ -3,7 +3,8 @@ from rest_framework import generics, mixins, permissions, \
 from rest_framework.response import Response
 from datetime import datetime
 
-from inapp_survey.models import Campaign, UserCampaign
+from inapp_survey.models import Campaign, UserCampaign, \
+    UserCampaignResponse
 from inapp_survey.serializers import CampaignSerializer, \
     CampaignListSerializer, UserCampaignSerializer
 
