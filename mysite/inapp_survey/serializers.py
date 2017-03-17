@@ -92,7 +92,6 @@ class UserCampaignSerializer(serializers.ModelSerializer):
     # user_campaign is not available for the nested responses
     # serializer
     def create(self, validated_data):
-        # import pdb;pdb.set_trace()
         answer_data = validated_data.pop('usercampaignresponse_set')
         usercampaign_post = UserCampaign.objects.create(**validated_data)
 

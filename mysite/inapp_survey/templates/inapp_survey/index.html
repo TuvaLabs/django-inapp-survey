@@ -276,8 +276,9 @@
       }
 
       function submitResponse(is_completed) {
+
         var data = {
-          "user": 1,
+          "user": {{request.user.id}},
           "campaign": surveyResponse.id,
           "is_completed": true,
           "is_canceled": !is_completed,
