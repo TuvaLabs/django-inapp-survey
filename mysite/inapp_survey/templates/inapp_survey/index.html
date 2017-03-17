@@ -168,7 +168,7 @@
         url: "/inapp_survey/api/campaigns/",
         type: 'POST',
         headers: { "X-CSRFToken": getCookie("csrftoken") },
-        data: JSON.stringify(custom_params),
+        data: JSON.stringify({"custom_params": custom_params, "completed_campaigns":getCampaignIdsSavedInLocalStorage()}),
         contentType: "application/json",
         success: function(result){
           if(result) {
@@ -190,7 +190,7 @@
       }
 
       function processSurvey() {
-        if(!surveyResponse.campaign_type) {
+        if(!surveyResponse.campaign_type || (!isAuthenticated && surveyResponse.campaign_type==='survey')) {
           return;
         }
         jQuery('.django-inapp-survey-announcement').html(converter.makeHtml(surveyResponse.description));
@@ -211,9 +211,18 @@
               submitResponse(false);
             }
           });
-        } else {
+        } else { // For announcement
           jQuery('.django-inapp-survey-close').click(function(){
-            submitResponse(true);
+            if(isAuthenticated) {
+              submitResponse(true);
+            } else {
+              // To store the closed announcements with localStorage when user is not authorized
+              var surveyIds = getCampaignIdsSavedInLocalStorage();
+              surveyIds.push(surveyResponse.id);
+              localStorage.setItem("surveyIds", surveyIds.join(','));
+              closeSurvey();
+            }
+
           });
           return;
         }
@@ -246,12 +255,7 @@
             surveyResponse.steps[stepIndex].response = activeQuestionObject;
 
             if(surveyResponse.steps.length === stepIndex+1) { // last step
-
-              if(isAuthenticated) {
-                // Make the backend call to submit
-                // answersArray
-                submitResponse(true);
-              };
+              submitResponse(true);
             } else {
               activeQuestionObject = undefined;
 
@@ -275,10 +279,15 @@
 
       }
 
+      function getCampaignIdsSavedInLocalStorage() {
+        var surveyIds = localStorage.getItem("surveyIds");
+        return surveyIds? surveyIds.split(','): [];
+      }
+
       function submitResponse(is_completed) {
 
         var data = {
-          "user": {{request.user.id}},
+          "user": {{request.user.id}}, // TODO: it should be moved to Django view
           "campaign": surveyResponse.id,
           "is_completed": true,
           "is_canceled": !is_completed,
