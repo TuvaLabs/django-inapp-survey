@@ -18,7 +18,7 @@ class ActiveCampaignList(views.APIView):
         permissions.AllowAny
     ]
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         # If its expired, don't return
         campaign = Campaign.objects.filter(expiry_date__gt=datetime.now()).order_by('expiry_date')

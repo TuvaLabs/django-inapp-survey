@@ -178,7 +178,7 @@
         }
       });
 
-      function closeSurvey(is_completed) {
+      function closeSurvey() {
         // TODO: Add an entry in the browser to avoid to show the announcement back
         // TODO: Animate and then remove
         jQuery('.django-inapp-survey-templates').remove();
@@ -205,12 +205,12 @@
             if(jQuery('body').hasClass('django-inapp-survey-campaign-open')) {
               jQuery('body').removeClass('django-inapp-survey-campaign-open');
             } else {
-              closeSurvey(false);
+              submitResponse(false);
             }
           });
         } else {
           jQuery('.django-inapp-survey-close').click(function(){
-              closeSurvey(true);
+            submitResponse(true);
           });
           return;
         }
@@ -247,36 +247,7 @@
               if(isAuthenticated) {
                 // Make the backend call to submit
                 // answersArray
-                var data = {
-                  "user": 1,
-                  "campaign": surveyResponse.id,
-                  "is_completed": true,
-                  "answers": []
-                }
-                for(var i=0; i<surveyResponse.steps.length; i++) {
-                  var step = surveyResponse.steps[i];
-                  data.answers[i] = {
-                    "question": step.id,
-                    "response": JSON.stringify(step.response)
-                  };
-                }
-
-                jQuery.ajax({
-                  url: '/inapp_survey/api/response/',
-                  type: 'POST',
-                  headers: { "X-CSRFToken": getCookie("csrftoken") },
-                  data: JSON.stringify(data),
-                  contentType: "application/json",
-                  success: function(result){
-                    // console.log("result", result);
-                    // TODO: close the form
-                    // TODO: Raise the exception
-                    jQuery('.django-inapp-survey-campaign').addClass('completed');
-                    setTimeout(function () {
-                      closeSurvey(true);
-                    }, 200);
-                  }
-                })
+                submitResponse(true);
               };
             } else {
               activeQuestionObject = undefined;
@@ -299,6 +270,46 @@
           jQuery('body').addClass('django-inapp-survey-campaign-open');
         });
 
+      }
+
+      function submitResponse(is_completed) {
+        var data = {
+          "user": 1,
+          "campaign": surveyResponse.id,
+          "is_completed": is_completed,
+          "is_canceled": !is_completed,
+          "answers": []
+        }
+        if(is_completed) {
+          for(var i=0; i<surveyResponse.steps.length; i++) {
+            var step = surveyResponse.steps[i];
+            data.answers[i] = {
+              "question": step.id,
+              "response": JSON.stringify(step.response)
+            };
+          }
+        }
+
+        jQuery.ajax({
+          url: '/inapp_survey/api/response/',
+          type: 'POST',
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          data: JSON.stringify(data),
+          contentType: "application/json",
+          success: function(result){
+            // console.log("result", result);
+            // TODO: close the form
+            // TODO: Raise the exception
+            if(is_completed) {
+              jQuery('.django-inapp-survey-campaign').addClass('completed');
+              setTimeout(function () {
+                closeSurvey();
+              }, 200);
+            } else {
+              closeSurvey();
+            }
+          }
+        });
       }
 
       function updateStep() {
