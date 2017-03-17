@@ -40,8 +40,10 @@ class ActiveCampaignList(views.APIView):
 
 
         # check for custom_param filtering
-        # user_param = {'user_type': 'teacher, student', 'page': 'dataset'}
-        user_param = {}
+        if request.data.has_key('custom_param'):
+            user_param = custom_param
+        else:
+            user_param = {}
         filter_based_on_param = []
 
         for item in campaign:
