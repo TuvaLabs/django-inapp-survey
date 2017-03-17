@@ -6,7 +6,7 @@ from inapp_survey.resources import ActiveCampaignList, ActiveCampaignDetails, \
 
 urlpatterns = [
     # TODO: only return the relevent
-    url(r'^/api/campaigns$',
+    url(r'^/api/campaigns/$',
         ActiveCampaignList.as_view(),
         name='active-campaign-list'),
     url(r'^/api/campaigns/(?P<slug>[0-9a-zA-Z_-]+)$',

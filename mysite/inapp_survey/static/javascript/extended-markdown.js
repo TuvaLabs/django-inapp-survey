@@ -66,9 +66,9 @@
                 type: 'lang',
                 filter: function (text, converter, options) {
                     return text.replace(/([\\?]) ?\[([0-9a-z_].*?)\] ?\[?(.*?)\]? ?([=]) ?([_]+)( ?{.*})?/g,
-                        function(match, questionMark, questionId, question, equalSign, textInd, answer){
+                        function(match, questionMark, questionId, rawQuestion, equalSign, textInd, answer){
                             // To convert the inline styles to html
-                            question = converter.makeHtml(question);
+                            var question = converter.makeHtml(rawQuestion);
 
                             if(textInd) {
                                 textInd = textInd.trim();
@@ -76,32 +76,23 @@
                                 return match;
                             }
 
-                            var questionObj = {
-                                type: textInd === '_'? 'text': 'textarea',
-                                question: question,
-                                questionId: questionId,
-                                answer: removeCurlyBraces(answer)
-                            };
-
-                            var domElement = getQuestionHeader(question, questionId);
-
-                            textInd = textInd.trim();
-
+                            var domElement = question;
                             if (textInd === '_') {
-                                domElement += '<input required style="margin: 5px 0;" type="text" ' +
-                                'ng-model="answers[\'' + questionId + '\'].userAnswer" ' +
-                                'name="' + questionId + '" id="' + questionId + '" />';
-                            }
-                            else if (textInd.length > 1) {
-                                domElement += '<textarea required style="margin: 5px 0;" rows="' + (textInd.length * 2 + 1) + '" ' +
-                                'ng-model="answers[\'' + questionId + '\'].userAnswer" ' +
-                                'name="' + questionId + '" id="' + questionId + '"></textarea>';
+                                domElement += '<input required type="text" ' +
+                                'name="' + questionId + '" />';
+                            } else if (textInd.length > 1) {
+                                domElement += '<textarea required rows="' + (textInd.length * 2 + 1) + '" ' +
+                                'name="' + questionId + '" ></textarea>';
                             }
 
-                            // Broadcast to controller
-                            broadCastQA(questionObj);
-
-                            domElement += getQuestionFooter(questionId);
+                            // Raise event
+                            var _inputType = (textInd === '_'? 'text': 'textarea');
+                            console.log("_inputType", _inputType);
+                            triggerEvent({
+                              "question": rawQuestion,
+                              "type": _inputType,
+                              "questionId": questionId,
+                            });
 
                             return domElement;
                     });
@@ -112,85 +103,37 @@
                 type: 'lang',
                 filter: function (text, converter, options) {
                     return text.replace(/([\\?]) ?\[([0-9a-z_].*?)\] ?\[?(.*?)\]? ?([=]) ?(\[\]|\(\))( ?{[0-9,]+})?([^]*?)(\n\n|^\n)/g,
-                        function(match, questionMark, questionId, question, equalSign, inputIndicator, answers ,optionsItems, end){
+                        function(match, questionMark, questionId, rawQuestion, equalSign, inputIndicator, answers ,optionsItems, end){
                             // To convert the inline styles to html
-                            question = converter.makeHtml(question);
+                            var question = converter.makeHtml(rawQuestion);
 
-                            var questionObj = {
-                                type: inputIndicator === '[]'? 'checkbox': 'radio',
-                                question: question,
-                                questionId: questionId,
-                                options: [],
-                                answer: removeCurlyBraces(answers)
-                            };
+                            var domElement = question;
 
-                            var domElement = getQuestionHeader(question, questionId);
-
+                            var _inputType = inputIndicator === '[]'? 'checkbox': 'radio';
+                            var _optionValues = [];
                             var optionRegEx = (inputIndicator === '[]') ? /^ {0,2}(\[\*?\])[ \t](.*)/gm : /^ {0,2}(\(\*?\))[ \t](.*)/gm;
-
-                            var listCounter = 0;
                             var optionsDom = "";
                             optionsDom += optionsItems.replace(optionRegEx, function (match, type, text) {
-                                var input = '<li><label><input type="' + (inputIndicator === '[]'? 'checkbox': 'radio') + '"';
-                                // TODO: Adding default checked option
-                                /* if(type.indexOf('*') != -1 ) {
-                                input += ' checked="checked"';
-                            } */
+                                _optionValues.push(text);
+                                var input = '<li><label><input required name="' + questionId + '" type="' + _inputType + '"';
+                                input += ' value="' + _optionValues.length + '"/> <span>&nbsp;' + text + '</span></label></li>';
+                                return input;
+                            });
 
-                            if(inputIndicator === '[]') {
-                                // Adding ng-required for the first item
-                                if(listCounter++ === 0) {
-                                    input += ' ng-required="!answers[\'' + questionId + '\'].userAnswer.length"';
-                                }
-                                input += ' checklist-model="answers[\'' + questionId + '\'].userAnswer"';
-                                input += ' checklist-value="\'' + listCounter + '\'"';
-                            } else {
-                                // Adding ng-required for the first item
-                                if(listCounter++ === 0) {
-                                    input += ' ng-required="!answers[\'' + questionId + '\'].userAnswer"';
-                                }
-                                input += ' ng-model="answers[\'' + questionId + '\'].userAnswer"';
-                                input += ' value="' + listCounter + '"';
-                                input += ' name="' + questionId + '"';
+                            if(optionsDom) {
+                                optionsDom = '<ul class="question-options">' + optionsDom + '</ul>';
                             }
 
-                            questionObj.options.push(text);
+                            // Raise event
+                            triggerEvent({
+                              "question": rawQuestion,
+                              "options": _optionValues,
+                              "type": _inputType,
+                              "questionId": questionId,
+                            });
 
-                            input += ' /> <span>&nbsp;' + converter.makeHtml(text).replace('<p>', '').replace('</p>', '') + '</span></label></li>';
-                            return input;
+                            return domElement + optionsDom;
                         });
-
-                        if(optionsDom) {
-                            optionsDom = '<ul class="question-options">' + optionsDom + '</ul>';
-                            domElement += '<div class="options-wrapper" ' +
-                            'ng-class="{true:\'invalid\',false:\'\'}[!answers[\'' + questionId + '\'].userAnswer && isFormSubmitted]">' +
-                            optionsDom +
-                            '</div>';
-                        }
-
-                        /*if(questionObj.type === "checkbox" && questionObj.actualAnswerIndex) {
-                            questionObj.actualAnswer = [];
-                            var answerIndex = questionObj.actualAnswerIndex.split(',');
-                            for(var index=0; index < answerIndex.length; index++) {
-                                var actualIndex = parseInt(answerIndex[index]);
-                                if(actualIndex > 0) {
-                                    questionObj.actualAnswer.push(questionObj.answerOptions[actualIndex-1]);
-                                    }
-                                }
-                        } else if(questionObj.type === "radio" && questionObj.actualAnswerIndex) {
-                            var actualIndex = parseInt(questionObj.actualAnswerIndex);
-                            if(actualIndex > 0) {
-                                questionObj.actualAnswer = questionObj.answerOptions[actualIndex-1];
-                            }
-                        }*/
-
-                        // Broadcast to controller
-                        broadCastQA(questionObj);
-
-                        domElement += getQuestionFooter(questionId);
-
-                        return domElement;
-                    });
                 }
             },
             // For Youtube and Vimeo video
@@ -341,51 +284,13 @@
         ];
     };
 
+    function triggerEvent(data) {
+      var event = new CustomEvent("django-inapp-survey-markdown-conversion",{'detail': data});
+      document.dispatchEvent(event);
+    }
+
     // Client-side export
     showdown.extension('extended', extended);
-
-    function getQuestionHeader(question, questionId) {
-        var domElement = '<div class="question-wrapper" ' +
-        'ng-class="{\'green\':answers[\'' + questionId + '\'].isCorrect, \'red\':!answers[\'' + questionId + '\'].isCorrect, \'lesson-review\': isReviewing() && !!answers[\'' + questionId + '\'].answer}">' +
-        '<div class="question">' +
-        '<div class="question-label"><i class="result-indicator glyphicon" ' +
-        'ng-class="{true:\'glyphicon-ok\', false: \'glyphicon-remove\'}[!!answers[\'' + questionId + '\'].isCorrect]">&nbsp;</i>';
-        if(question) {
-            domElement += '<span>' + question.replace('<p>', '').replace('</p>', '') + '</span>';
-        }
-        domElement += '</div>';
-
-        return domElement;
-    }
-
-    function getQuestionFooter(questionId) {
-        var domElement = '</div>' +
-        '<div ng-if="isReviewing() && !!answers[\'' + questionId + '\'].answer && !answers[\'' + questionId + '\'].isCorrect">' +
-        '<b>Correct Answer:</b> '+
-        '<span class="answer" ng-bind-html="getActualAnswer(answers[\'' + questionId + '\'])"></span>' +
-        '</div>' +
-        '</div>';
-
-        return domElement;
-    }
-
-    function broadCastQA(question) {
-        if(question) {
-            if(question.answer) {
-                if(question.type === "checkbox") {
-                    question.answer = question.answer.split(",");
-                }
-            } else {
-                delete question.answer;
-            }
-
-            var appElement = document.querySelector('[ng-app]'); //="com.tuvalabs.courses"
-            if(appElement) {
-                var appScope = angular.element(appElement).scope();
-                appScope.$broadcast("QA", question);
-            }
-        }
-    }
 
     function removeCurlyBraces(text) {
         if(text) {

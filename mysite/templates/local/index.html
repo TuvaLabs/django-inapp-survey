@@ -2,10 +2,18 @@
 <html>
 <head>
     <title>Testing Page for Survey</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <script src="/static/bower_components/jquery/jquery.min.js"></script>
+    <style>
+      * {
+        font-family: 'Montserrat',sans-serif;
+        font-size: 13px;
+      }
+    </style>
 </head>
 <body>
     Hello World!
-{% include 'inapp_survey/index.html' with custom_params="user_type:'teacher'"%}
+{% include 'inapp_survey/index.html' with custom_params=survey_params%}
 <script type="text/javascript"></script>
 </body>
 </html>

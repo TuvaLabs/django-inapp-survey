@@ -1,8 +1,347 @@
+<style type="text/css">
+.django-inapp-survey-templates {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: #fff;
+  border-top: 1px solid #ccc;
+  max-height: 50%;
+  overflow: auto;
+  z-index: 99;
+}
+.django-inapp-survey-templates p {
+  margin: 0;
+}
+.django-inapp-survey-templates .django-inapp-survey-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  cursor: pointer;
+}
+.django-inapp-survey-container {
+  max-width: 1000px;
+  margin: auto;
+  height: 100%;
+}
+.django-inapp-survey-announcement {
+  text-align: center;
+  transition: all 300ms;
+}
+
+.footer .navigate-buttons {
+  float: right;
+}
+.django-inapp-survey-campaign {
+  box-sizing: border-box;
+  max-width: 600px;
+  margin: auto;
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  height: 100%;
+  overflow: auto;
+  display: none;
+  /*visibility: hidden;
+  height: 0;*/
+  transition: all 300ms;
+}
+.feedback-page {
+  font-size: 200px;
+  color: green;
+  text-align: center;
+  display: none;
+}
+.django-inapp-survey-campaign.completed .feedback-page {
+  display: block;
+}
+.django-inapp-survey-campaign form input[type=text], .django-inapp-survey-campaign form textarea {
+  width: 100%;
+  margin: 20px 0;
+  box-sizing: border-box;
+}
+.django-inapp-survey-campaign.completed form {
+  display: none;
+}
+.django-inapp-survey-campaign.completed .footer {
+  display: none;
+}
+.submit-button {
+  display: none;
+}
+
+.django-inapp-survey-overlay {
+  background: #000;
+  opacity: 0.7;
+  position: fixed;
+  top: 100%;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  transition: all 200ms;
+}
+.django-inapp-survey-form ul.question-options {
+  list-style: none;
+  padding: 0;
+}
+/* FOR SURVEY CASE */
+.django-inapp-survey-templates.campaign-survey .django-inapp-survey-announcement {
+  cursor: pointer;
+}
+.django-inapp-survey-templates.campaign-survey .django-inapp-survey-announcement a{
+  pointer-events: none;
+}
+/* FOR OPENED CASE */
+.django-inapp-survey-campaign-open .django-inapp-survey-announcement {
+  display: none;
+}
+.django-inapp-survey-campaign-open .django-inapp-survey-campaign {
+  display: block;
+}
+.django-inapp-survey-campaign-open .django-inapp-survey-overlay {
+  top: 0;
+}
+</style>
 <div>
-
-First Campaign - for {{ custom_params }}
-<script type="text/javascript">
-    console.log("{{custom_params}}");
-</script>
-
+  First Campaign - for {{ custom_params }}
 </div>
+<div id="django-inapp-survey-content" class="django-inapp-survey-templates">
+  <div class="django-inapp-survey-close"><i class="fa fa-close"></i></div>
+  <div class="django-inapp-survey-container">
+    <div class="django-inapp-survey-announcement"></div>
+    <div class="django-inapp-survey-campaign">
+      <!-- <h2>Lorem ipsum: Dolor sit amet, consectetur adipiscing elit</h2> -->
+      <form class="django-inapp-survey-form">
+      </form>
+      <div class="feedback-page">
+          <i class="fa fa-check" aria-hidden="true"></i>
+      </div>
+      <div class="footer">
+        <span>Step <span class="current-step"></span> of <span class="total-step"></span></span>
+        <div class="navigate-buttons">
+            <button class="previous-button">Previous</button>
+            <button class="next-button">Next</button>
+            <button class="submit-button">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="django-inapp-survey-overlay"></div>
+<script type="text/javascript">
+  // using jQuery
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+
+    var custom_params = {{custom_params|safe}};
+    var isAuthenticated = '{{user.is_authenticated|yesno}}'=='yes';
+
+    jQuery(document).ready(function(){
+      var stepIndex = 0,
+        surveyResponse,
+        activeQuestionObject,
+        converter = new showdown.Converter({extensions: ['extended']});
+
+      // Listen for markdown conversion event
+      document.addEventListener('django-inapp-survey-markdown-conversion', function(e) {
+        activeQuestionObject = e.detail;
+      });
+
+      // Get new announcement/campaign
+      jQuery.ajax({
+        url: "/inapp_survey/api/campaigns/",
+        type: 'POST',
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        data: JSON.stringify(custom_params),
+        contentType: "application/json",
+        success: function(result){
+          if(result) {
+            surveyResponse = result;
+            processSurvey();
+          }
+        }
+      });
+
+      function closeSurvey(is_completed) {
+        // TODO: Add an entry in the browser to avoid to show the announcement back
+        // TODO: Animate and then remove
+        jQuery('.django-inapp-survey-templates').remove();
+
+        if(jQuery('body').hasClass('django-inapp-survey-campaign-open')) {
+          jQuery('body').removeClass('django-inapp-survey-campaign-open');
+        }
+
+      }
+
+      function processSurvey() {
+        if(!surveyResponse.campaign_type) {
+          return;
+        }
+        jQuery('.django-inapp-survey-announcement').html(converter.makeHtml(surveyResponse.description));
+        // To show
+        jQuery('.django-inapp-survey-templates').show();
+
+
+        if(surveyResponse.steps.length > 0 && surveyResponse.campaign_type === 'survey') {
+          jQuery('.django-inapp-survey-templates').addClass('campaign-survey');
+
+          jQuery('.django-inapp-survey-close').click(function(){
+            if(jQuery('body').hasClass('django-inapp-survey-campaign-open')) {
+              jQuery('body').removeClass('django-inapp-survey-campaign-open');
+            } else {
+              closeSurvey(false);
+            }
+          });
+        } else {
+          jQuery('.django-inapp-survey-close').click(function(){
+              closeSurvey(true);
+          });
+          return;
+        }
+
+        // jQuery('.django-inapp-survey-campaign h2').html(surveyResponse.title);
+
+        jQuery('.total-step').html(surveyResponse.steps.length);
+
+        jQuery('.next-button').click(function(){
+          jQuery('.django-inapp-survey-form').submit();
+        });
+        jQuery('.previous-button').click(function(){
+          stepIndex--;
+          updateStep();
+        });
+
+        jQuery('.django-inapp-survey-form').submit(function() {
+            var dataArray = jQuery(this).serializeArray();
+
+            var userAnswer = [];
+
+            for (i=0; i<dataArray.length; i++) {
+              if(dataArray[i].name === activeQuestionObject.questionId) {
+                userAnswer.push(dataArray[i].value);
+              }
+            }
+
+            activeQuestionObject.userAnswer = activeQuestionObject.type === 'checkbox'? userAnswer: userAnswer[0];
+
+            surveyResponse.steps[stepIndex].response = activeQuestionObject;
+
+            if(surveyResponse.steps.length === stepIndex+1) { // last step
+
+              if(isAuthenticated) {
+                // Make the backend call to submit
+                // answersArray
+                var data = {
+                  "user": 1,
+                  "campaign": surveyResponse.id,
+                  "is_completed": true,
+                  "answers": []
+                }
+                for(var i=0; i<surveyResponse.steps.length; i++) {
+                  var step = surveyResponse.steps[i];
+                  data.answers[i] = {
+                    "question": step.id,
+                    "response": JSON.stringify(step.response)
+                  };
+                }
+
+                jQuery.ajax({
+                  url: '/inapp_survey/api/response/',
+                  type: 'POST',
+                  headers: { "X-CSRFToken": getCookie("csrftoken") },
+                  data: JSON.stringify(data),
+                  contentType: "application/json",
+                  success: function(result){
+                    // console.log("result", result);
+                    // TODO: close the form
+                    // TODO: Raise the exception
+                    jQuery('.django-inapp-survey-campaign').addClass('completed');
+                    setTimeout(function () {
+                      closeSurvey(true);
+                    }, 200);
+                  }
+                })
+              };
+            } else {
+              activeQuestionObject = undefined;
+
+              stepIndex++;
+              updateStep();
+            }
+            return false;
+        });
+
+        jQuery('.submit-button').click(function(){
+          jQuery('.django-inapp-survey-form').submit();
+        });
+
+        // For the initial step
+        updateStep();
+
+        // To show
+        jQuery('.django-inapp-survey-templates.campaign-survey .django-inapp-survey-announcement').click(function(){
+          jQuery('body').addClass('django-inapp-survey-campaign-open');
+        });
+
+      }
+
+      function updateStep() {
+        if(!(surveyResponse.steps.length > stepIndex)) {
+          // TODO: Reset step index
+          return;
+        }
+
+        // To show/hide the next and previous button
+        if(stepIndex == surveyResponse.steps.length-1) {
+          jQuery('.next-button').hide();
+          jQuery('.submit-button').show();
+        } else {
+          jQuery('.next-button').show();
+          jQuery('.submit-button').hide();
+        }
+
+        if(stepIndex == 0) {
+          jQuery('.previous-button').hide();
+        } else {
+          jQuery('.previous-button').show();
+        }
+
+        jQuery('.current-step').html(stepIndex + 1);
+
+        var form = jQuery('.django-inapp-survey-form');
+
+        form.html(
+          converter.makeHtml(surveyResponse.steps[stepIndex].question)
+        );
+
+        // Fill the value
+        var oldAns = surveyResponse.steps[stepIndex].response;
+        if(oldAns && oldAns.userAnswer) {
+          var ans = oldAns.userAnswer;
+          if(oldAns.type === 'radio') {
+            ans = [ans];
+          }
+          form.find("[name='" + oldAns.questionId + "']").val(ans);
+        }
+      }
+    });
+</script>
+<link rel="stylesheet" href="/static/bower_components/components-font-awesome/css/font-awesome.min.css"></link>
+<script src="/static/bower_components/showdown/dist/showdown.min.js"></script>
+<script src="/static/javascript/extended-markdown.js"></script>
