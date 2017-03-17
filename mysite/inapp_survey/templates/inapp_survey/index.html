@@ -120,7 +120,7 @@
           <i class="fa fa-check" aria-hidden="true"></i>
       </div>
       <div class="footer">
-        <span>Step <span class="current-step"></span> of <span class="total-step"></span></span>
+        <span class="step-progress">Step <span class="current-step"></span> of <span class="total-step"></span></span>
         <div class="navigate-buttons">
             <button class="previous-button">Previous</button>
             <button class="next-button">Next</button>
@@ -199,6 +199,9 @@
 
 
         if(surveyResponse.steps.length > 0 && surveyResponse.campaign_type === 'survey') {
+          if(surveyResponse.steps.length === 1) {
+            jQuery('.django-inapp-survey-templates .step-progress').hide();
+          }
           jQuery('.django-inapp-survey-templates').addClass('campaign-survey');
 
           jQuery('.django-inapp-survey-close').click(function(){
@@ -276,7 +279,7 @@
         var data = {
           "user": 1,
           "campaign": surveyResponse.id,
-          "is_completed": is_completed,
+          "is_completed": true,
           "is_canceled": !is_completed,
           "answers": []
         }
