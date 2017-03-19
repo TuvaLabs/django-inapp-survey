@@ -6,7 +6,7 @@ import json
 # Create your views here.
 def index(request):
     survey_params = {
-        'user_type':['teacher','sutdent'],
+        'user_type': 'teacher',
         'is_authenticated': True,
         }
     context = RequestContext(

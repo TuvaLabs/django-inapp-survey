@@ -13,6 +13,11 @@
 </head>
 <body>
     Hello World!
+    <br>
+    Logged in: {{request.user.is_authenticated}}
+    <br>
+    User: {{request.user}}
+    <br>
 {% include 'inapp_survey/index.html' with custom_params=survey_params%}
 <script type="text/javascript"></script>
 </body>

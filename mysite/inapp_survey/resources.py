@@ -37,18 +37,20 @@ class ActiveCampaignList(views.APIView):
             campaign = campaign.exclude(id__in=exclude_responded)
         else:
             campaign = campaign.filter(is_authenticated=False)
-
+            # If user is unauthenticated, also exclude the completed/canceled
+            # campaigns passed by front end.
+            if request.data.has_key('completed_campaigns'):
+                campaign = campaign.exclude(
+                    id__in=request.data['completed_campaigns'])
 
         # check for custom_param filtering
-        if request.data.has_key('custom_param'):
-            user_param = custom_param
-        else:
-            user_param = {}
+        user_param = {}
+        if request.data.has_key('custom_params'):
+            user_param = request.data['custom_params']
         filter_based_on_param = []
-
         for item in campaign:
             for param in item.custom_param.all():
-                if user_param.has_key(param.param_key) and param.param_value in user_param[param.param_key]:
+                if user_param.has_key(param.param_key) and user_param[param.param_key] in param.param_value:
                     pass
                 else:
                     filter_based_on_param.append(item.id)
