@@ -6,6 +6,6 @@ from django.template import RequestContext
 def index(request):
 
     return render_to_response(
-            'local/index.html',
+            'inapp_survey/index.html',
             context_instance=RequestContext(request))
     # return HttpResponse("Hello, world. You're at the in app index.")

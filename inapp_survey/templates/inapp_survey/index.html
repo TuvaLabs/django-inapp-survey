@@ -105,9 +105,6 @@
   top: 0;
 }
 </style>
-<div>
-  First Campaign - for {{ custom_params }}
-</div>
 <div id="django-inapp-survey-content" class="django-inapp-survey-templates">
   <div class="django-inapp-survey-close"><i class="fa fa-close"></i></div>
   <div class="django-inapp-survey-container">
@@ -164,6 +161,8 @@
       });
 
       // Get new announcement/campaign
+      // TODO: Can we not use "inapp_survey" as hard coded value here,
+      // and make it dynamic
       jQuery.ajax({
         url: "/inapp_survey/api/campaigns/",
         type: 'POST',

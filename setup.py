@@ -1,20 +1,20 @@
 import os
-from setuptools import find_packages, setup
+from setuptools import setup, find_packages
 
-with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
-    README = readme.read()
+import inapp_survey
 
-# allow setup.py to be run from any path
-os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name='django-inapp-survey',
-    version='0.1',
+    version=inapp_survey.__version__,
     packages=find_packages(),
     include_package_data=True,
     license='Apache License 2.0',  # example license
     description='A simple Django app to conduct Web-based survey or do announcement.',
-    long_description=README,
+    long_description=read('README.md'),
     url='https://github.com/TuvaLabs/django-inapp-survey',
     author='Jaimin <jpatel@tuvalabs.com>, Naveen <nganesan@tuvalabs.com>',
     author_email='support@tuvalabs.com',
@@ -32,4 +32,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
+    install_requires=[ 'django >= 1.9', 'djangorestframework', 'django-extensions' ],
 )

@@ -1,5 +1,5 @@
 include LICENSE
-include README.rst
+include README.md
 recursive-include inapp_survey/static *
-recursive-include polls/templates *
-recursive-include docs *
+recursive-include inapp_survey/templates *
+recursive-include inapp_survey/docs *

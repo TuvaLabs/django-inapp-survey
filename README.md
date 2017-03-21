@@ -22,7 +22,7 @@ Quick start
 
     url(r'^inapp_survey/', include('inapp_survey.urls')),
 
-3. Run `python manage.py migrate` to create the polls models.
+3. Run `python manage.py migrate inapp_survey` to create the campaign models.
 
 4. Start the development server and visit http://127.0.0.1:8000/admin/
    to create a survey (you'll need the Admin app enabled).
