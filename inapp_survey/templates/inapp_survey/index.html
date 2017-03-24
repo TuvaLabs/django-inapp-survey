@@ -1,10 +1,23 @@
 <style type="text/css">
-.django-inapp-survey-templates {
-  display: none;
+/* FOR OVERLAY ELEMENT */
+.django-inapp-survey-overlay {
+  background: #000;
+  opacity: 0.7;
   position: fixed;
+  top: 0;
   bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  transition: all 200ms;
+}
+
+/* FOR ANNOUNCEMENT ELEMENT */
+.django-inapp-survey-wrapper {
+  position: fixed;
   left: 0;
   right: 0;
+  bottom: 0;
   padding: 10px;
   background: #fff;
   border-top: 1px solid #ccc;
@@ -12,359 +25,103 @@
   overflow: auto;
   z-index: 99;
 }
-.django-inapp-survey-templates p {
+.django-inapp-survey-wrapper p {
   margin: 0;
 }
-.django-inapp-survey-templates .django-inapp-survey-close {
+.django-inapp-survey-wrapper.campaign {
+    cursor: pointer;
+}
+.django-inapp-survey-wrapper.campaign a {
+    pointer-events: none;
+}
+.django-inapp-survey-close {
   position: absolute;
   top: 0;
   right: 0;
   padding: 10px;
   cursor: pointer;
 }
-.django-inapp-survey-container {
+.django-inapp-survey-announcement {
   max-width: 1000px;
   margin: auto;
-  height: 100%;
-}
-.django-inapp-survey-announcement {
   text-align: center;
-  transition: all 300ms;
 }
 
-.footer .navigate-buttons {
-  float: right;
-}
+/* FOR CAMPAIGN ELEMENT */
 .django-inapp-survey-campaign {
-  box-sizing: border-box;
-  max-width: 600px;
-  margin: auto;
-  border: 1px solid #ccc;
-  padding: 10px 20px;
-  height: 100%;
-  overflow: auto;
-  display: none;
-  /*visibility: hidden;
-  height: 0;*/
-  transition: all 300ms;
-}
-.feedback-page {
-  font-size: 200px;
-  color: green;
-  text-align: center;
-  display: none;
-}
-.django-inapp-survey-campaign.completed .feedback-page {
-  display: block;
+    box-sizing: border-box;
+    max-width: 600px;
+    margin: auto;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    height: 100%;
+    overflow: auto;
 }
 .django-inapp-survey-campaign form input[type=text], .django-inapp-survey-campaign form textarea {
   width: 100%;
   margin: 20px 0;
   box-sizing: border-box;
 }
-.django-inapp-survey-campaign.completed form {
-  display: none;
-}
-.django-inapp-survey-campaign.completed .footer {
-  display: none;
-}
-.submit-button {
-  display: none;
-}
-
-.django-inapp-survey-overlay {
-  background: #000;
-  opacity: 0.7;
-  position: fixed;
-  top: 100%;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  z-index: 10;
-  transition: all 200ms;
-}
-.django-inapp-survey-form ul.question-options {
+.django-inapp-survey-campaign form ul.question-options {
   list-style: none;
   padding: 0;
 }
-/* FOR SURVEY CASE */
-.django-inapp-survey-templates.campaign-survey .django-inapp-survey-announcement {
-  cursor: pointer;
+.django-inapp-survey-campaign .footer .navigate-buttons {
+  float: right;
 }
-.django-inapp-survey-templates.campaign-survey .django-inapp-survey-announcement a{
-  pointer-events: none;
-}
-/* FOR OPENED CASE */
-.django-inapp-survey-campaign-open .django-inapp-survey-announcement {
-  display: none;
-}
-.django-inapp-survey-campaign-open .django-inapp-survey-campaign {
-  display: block;
-}
-.django-inapp-survey-campaign-open .django-inapp-survey-overlay {
-  top: 0;
+/* FOR CAMPAIGN SUCCESS ELEMENT */
+.django-inapp-survey-success {
+  font-size: 150px;
+  color: green;
+  text-align: center;
 }
 </style>
-<div id="django-inapp-survey-content" class="django-inapp-survey-templates">
-  <div class="django-inapp-survey-close"><i class="fa fa-close"></i></div>
-  <div class="django-inapp-survey-container">
+<!-- Overlay Template -->
+<script id="django-inapp-survey-overlay-template" type="text/x-custom-template">
+  <div class="django-inapp-survey-overlay"></div>
+</script>
+<!-- Announcement Template -->
+<script id="django-inapp-survey-announcement-template" type="text/x-custom-template">
+  <div class="django-inapp-survey-wrapper">
+    <div class="django-inapp-survey-close"><i class="fa fa-close"></i></div>
     <div class="django-inapp-survey-announcement"></div>
+  </div>
+</script>
+<!-- Campaign Template -->
+<script id="django-inapp-survey-campaign-template" type="text/x-custom-template">
+  <div class="django-inapp-survey-wrapper">
+    <div class="django-inapp-survey-close"><i class="fa fa-chevron-down"></i></div>
     <div class="django-inapp-survey-campaign">
-      <!-- <h2>Lorem ipsum: Dolor sit amet, consectetur adipiscing elit</h2> -->
-      <form class="django-inapp-survey-form">
+      <form class="django-inapp-survey-campaign-form">
       </form>
-      <div class="feedback-page">
-          <i class="fa fa-check" aria-hidden="true"></i>
-      </div>
       <div class="footer">
         <span class="step-progress">Step <span class="current-step"></span> of <span class="total-step"></span></span>
         <div class="navigate-buttons">
-            <button class="previous-button">Previous</button>
-            <button class="next-button">Next</button>
-            <button class="submit-button">Submit</button>
+          <button class="previous-button">Previous</button>
+          <button class="next-button">Next</button>
+          <button class="submit-button">Submit</button>
         </div>
       </div>
     </div>
   </div>
-</div>
-<div class="django-inapp-survey-overlay"></div>
+</script>
+<!-- Campaign Success Template -->
+<script id="django-inapp-survey-success-template" type="text/x-custom-template">
+  <div class="django-inapp-survey-wrapper">
+    <div class="django-inapp-survey-success">
+        <i class="fa fa-check" aria-hidden="true"></i>
+    </div>
+  </div>
+</script>
+<!-- Global Variables -->
 <script type="text/javascript">
-  // using jQuery
-  function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-  }
-
-    var custom_params = {{custom_params|safe}};
-    var isAuthenticated = '{{user.is_authenticated|yesno}}'=='yes';
-
-    jQuery(document).ready(function(){
-      var stepIndex = 0,
-        surveyResponse,
-        activeQuestionObject,
-        converter = new showdown.Converter({extensions: ['extended']});
-
-      // Listen for markdown conversion event
-      document.addEventListener('django-inapp-survey-markdown-conversion', function(e) {
-        activeQuestionObject = e.detail;
-      });
-
-      // Get new announcement/campaign
-      // TODO: Can we not use "inapp_survey" as hard coded value here,
-      // and make it dynamic
-      jQuery.ajax({
-        url: "/inapp_survey/api/campaigns/",
-        type: 'POST',
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        data: JSON.stringify({"custom_params": custom_params, "completed_campaigns":getCampaignIdsSavedInLocalStorage()}),
-        contentType: "application/json",
-        success: function(result){
-          if(result) {
-            surveyResponse = result;
-            processSurvey();
-          }
-        }
-      });
-
-      function closeSurvey() {
-        // TODO: Add an entry in the browser to avoid to show the announcement back
-        // TODO: Animate and then remove
-        jQuery('.django-inapp-survey-templates').remove();
-
-        if(jQuery('body').hasClass('django-inapp-survey-campaign-open')) {
-          jQuery('body').removeClass('django-inapp-survey-campaign-open');
-        }
-
-      }
-
-      function processSurvey() {
-        if(!surveyResponse.campaign_type || (!isAuthenticated && surveyResponse.campaign_type==='survey')) {
-          return;
-        }
-        jQuery('.django-inapp-survey-announcement').html(converter.makeHtml(surveyResponse.description));
-        // To show
-        jQuery('.django-inapp-survey-templates').show();
-
-
-        if(surveyResponse.steps.length > 0 && surveyResponse.campaign_type === 'survey') {
-          if(surveyResponse.steps.length === 1) {
-            jQuery('.django-inapp-survey-templates .step-progress').hide();
-          }
-          jQuery('.django-inapp-survey-templates').addClass('campaign-survey');
-
-          jQuery('.django-inapp-survey-close').click(function(){
-            if(jQuery('body').hasClass('django-inapp-survey-campaign-open')) {
-              jQuery('body').removeClass('django-inapp-survey-campaign-open');
-            } else {
-              submitResponse(false);
-            }
-          });
-        } else { // For announcement
-          jQuery('.django-inapp-survey-close').click(function(){
-            if(isAuthenticated) {
-              submitResponse(true);
-            } else {
-              // To store the closed announcements with localStorage when user is not authorized
-              var surveyIds = getCampaignIdsSavedInLocalStorage();
-              surveyIds.push(surveyResponse.id);
-              localStorage.setItem("surveyIds", surveyIds.join(','));
-              closeSurvey();
-            }
-
-          });
-          return;
-        }
-
-        // jQuery('.django-inapp-survey-campaign h2').html(surveyResponse.title);
-
-        jQuery('.total-step').html(surveyResponse.steps.length);
-
-        jQuery('.next-button').click(function(){
-          jQuery('.django-inapp-survey-form').submit();
-        });
-        jQuery('.previous-button').click(function(){
-          stepIndex--;
-          updateStep();
-        });
-
-        jQuery('.django-inapp-survey-form').submit(function() {
-            var dataArray = jQuery(this).serializeArray();
-
-            var userAnswer = [];
-
-            for (i=0; i<dataArray.length; i++) {
-              if(dataArray[i].name === activeQuestionObject.questionId) {
-                userAnswer.push(dataArray[i].value);
-              }
-            }
-
-            activeQuestionObject.userAnswer = activeQuestionObject.type === 'checkbox'? userAnswer: userAnswer[0];
-
-            surveyResponse.steps[stepIndex].response = activeQuestionObject;
-
-            if(surveyResponse.steps.length === stepIndex+1) { // last step
-              submitResponse(true);
-            } else {
-              activeQuestionObject = undefined;
-
-              stepIndex++;
-              updateStep();
-            }
-            return false;
-        });
-
-        jQuery('.submit-button').click(function(){
-          jQuery('.django-inapp-survey-form').submit();
-        });
-
-        // For the initial step
-        updateStep();
-
-        // To show
-        jQuery('.django-inapp-survey-templates.campaign-survey .django-inapp-survey-announcement').click(function(){
-          jQuery('body').addClass('django-inapp-survey-campaign-open');
-        });
-
-      }
-
-      function getCampaignIdsSavedInLocalStorage() {
-        var surveyIds = localStorage.getItem("surveyIds");
-        return surveyIds? surveyIds.split(','): [];
-      }
-
-      function submitResponse(is_completed) {
-
-        var data = {
-          "user": {{request.user.id}}, // TODO: it should be moved to Django view
-          "campaign": surveyResponse.id,
-          "is_completed": true,
-          "is_canceled": !is_completed,
-          "answers": []
-        }
-        if(is_completed) {
-          for(var i=0; i<surveyResponse.steps.length; i++) {
-            var step = surveyResponse.steps[i];
-            data.answers[i] = {
-              "question": step.id,
-              "response": JSON.stringify(step.response)
-            };
-          }
-        }
-
-        jQuery.ajax({
-          url: '/inapp_survey/api/response/',
-          type: 'POST',
-          headers: { "X-CSRFToken": getCookie("csrftoken") },
-          data: JSON.stringify(data),
-          contentType: "application/json",
-          success: function(result){
-            // console.log("result", result);
-            // TODO: close the form
-            // TODO: Raise the exception
-            if(is_completed) {
-              jQuery('.django-inapp-survey-campaign').addClass('completed');
-              setTimeout(function () {
-                closeSurvey();
-              }, 200);
-            } else {
-              closeSurvey();
-            }
-          }
-        });
-      }
-
-      function updateStep() {
-        if(!(surveyResponse.steps.length > stepIndex)) {
-          // TODO: Reset step index
-          return;
-        }
-
-        // To show/hide the next and previous button
-        if(stepIndex == surveyResponse.steps.length-1) {
-          jQuery('.next-button').hide();
-          jQuery('.submit-button').show();
-        } else {
-          jQuery('.next-button').show();
-          jQuery('.submit-button').hide();
-        }
-
-        if(stepIndex == 0) {
-          jQuery('.previous-button').hide();
-        } else {
-          jQuery('.previous-button').show();
-        }
-
-        jQuery('.current-step').html(stepIndex + 1);
-
-        var form = jQuery('.django-inapp-survey-form');
-
-        form.html(
-          converter.makeHtml(surveyResponse.steps[stepIndex].question)
-        );
-
-        // Fill the value
-        var oldAns = surveyResponse.steps[stepIndex].response;
-        if(oldAns && oldAns.userAnswer) {
-          var ans = oldAns.userAnswer;
-          if(oldAns.type === 'radio') {
-            ans = [ans];
-          }
-          form.find("[name='" + oldAns.questionId + "']").val(ans);
-        }
-      }
-    });
+  var inappSurveyParams = {
+      customParams: {{custom_params|safe}},
+      userId: {{request.user.id|default_if_none:0}},
+      isAuthenticated: '{{user.is_authenticated|yesno}}'==='yes'
+  };
 </script>
 <link rel="stylesheet" href="/static/bower_components/components-font-awesome/css/font-awesome.min.css"></link>
 <script src="/static/bower_components/showdown/dist/showdown.min.js"></script>
 <script src="/static/javascript/extended-markdown.js"></script>
+<script src="/static/javascript/script.js"></script>
