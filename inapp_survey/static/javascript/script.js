@@ -384,8 +384,10 @@
                         inAppSurveyService.submitSurvey(data, function(result){
                             // TODO: Exception handeling
                             campaign.remove();
-                            var inappSuccessEle = new InAppSuccess();
-                            inappSuccessEle.show();
+                            if(isCompleted) {
+                                var inappSuccessEle = new InAppSuccess();
+                                inappSuccessEle.show();
+                            }
                         });
                     });
                 }
