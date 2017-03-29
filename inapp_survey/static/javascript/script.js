@@ -7,7 +7,7 @@
     }
 
     // For makrdown conversion
-    var _markdownConverter = new showdown.Converter({extensions: ['extended']});
+    var _markdownConverter = new showdown.Converter({extensions: ['inapp-survey-extended']});
     function convertMarkdownToHtml(markdownText) {
         return _markdownConverter.makeHtml(markdownText);
     }

@@ -290,7 +290,7 @@
     }
 
     // Client-side export
-    showdown.extension('extended', extended);
+    showdown.extension('inapp-survey-extended', extended);
 
     function removeCurlyBraces(text) {
         if(text) {
