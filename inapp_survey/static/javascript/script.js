@@ -377,7 +377,7 @@
                         var data = {
                             "user": userId,
                             "campaign": surveyObj.id,
-                            "is_completed": isCompleted,
+                            "is_completed": true,
                             "is_canceled": !isCompleted,
                             "answers": answer
                         }
