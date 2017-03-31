@@ -210,14 +210,16 @@
             });
 
             _surveyForm.submit(function(event) {
+                var dataArray = $(this).serializeArray();
                 if(!this.checkValidity())
                 {
-                    // Diallow unanswered questions
-                    event.preventDefault();
-                    return;
+                    if(!(_activeQuestionObject.type === 'checkbox' && dataArray.length && dataArray[0].value)) {
+                        // Diallow unanswered questions
+                        event.preventDefault();
+                        return;
+                    }
                 }
 
-                var dataArray = $(this).serializeArray();
                 var userAnswer = [];
                 for (var i=0; i<dataArray.length; i++) {
                     if(dataArray[i].name === _activeQuestionObject.questionId) {
@@ -232,7 +234,7 @@
                         var step = _surveyObj.steps[i];
                         answers[i] = {
                             "question": step.id,
-                            "response": JSON.stringify(step.response)
+                            "response": step.response.userAnswer.constructor === Array? step.response.userAnswer.join(','): step.response.userAnswer //JSON.stringify(step.response)
                         };
                     }
                     _onCloseCallBack(answers, true);
@@ -329,7 +331,7 @@
 
             setTimeout(function () {
                 _self.remove();
-            }, 1000);
+            }, 1200);
         };
         this.remove = function() {
             _successElement.slideUp('normal', function(){

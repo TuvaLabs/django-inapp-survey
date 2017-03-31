@@ -116,7 +116,7 @@
                             optionsDom += optionsItems.replace(optionRegEx, function (match, type, text) {
                                 _optionValues.push(text);
                                 var input = '<li><label><input required name="' + questionId + '" type="' + _inputType + '"';
-                                input += ' value="' + _optionValues.length + '"/> <span>&nbsp;' + text + '</span></label></li>';
+                                input += ' value="' + text + '"/> <span>&nbsp;' + text + '</span></label></li>';
                                 return input;
                             });
 

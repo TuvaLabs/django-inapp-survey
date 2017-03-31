@@ -199,10 +199,10 @@
             this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=_");
         },
         handleQuestionRadio: function() {
-            this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=() {1}\r\n() OPTION 1\r\n() OPTION 2\r\n");
+            this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=()\r\n() OPTION 1\r\n() OPTION 2\r\n");
         },
         handleQuestionCheckbox: function() {
-            this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=[] {1,2}\r\n[] OPTION 1\r\n[] OPTION 2\r\n[] OPTION 3\r\n");
+            this.mde.replaceSelection("?[question_id][ACTUAL_QUESTION]=[]\r\n[] OPTION 1\r\n[] OPTION 2\r\n[] OPTION 3\r\n");
         },
         handleBreak: function() {
             this.mde.replaceSelection(";;br");
