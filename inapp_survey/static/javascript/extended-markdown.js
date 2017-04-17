@@ -229,8 +229,7 @@
                         caption += '<figcaption style="text-align:left;background-color:#494949;padding:5px 10px;color:#fff;margin-bottom:10px;">' + title + '</figcaption>';
                     }
 
-                    var html = '<a style="cursor:-webkit-zoom-in;cursor:-moz-zoom-in;cursor:-ms-zoom-in;" href="javascript:showImageModal(\'' + imageUrl  + '\', \'' + altText  + '\', \'' + title  + '\')">';
-                    html += '<img style="max-width: 100%;" src="' + imageUrl + '" alt="' + altText + '"';
+                    var html = '<img style="max-width: 100%;" src="' + imageUrl + '" alt="' + altText + '"';
 
                     if(width > 0 || height > 0) {
                         html += 'style="';
@@ -243,7 +242,7 @@
                         html += '"';
                     }
 
-                    html += '/></a>' + caption;
+                    html += '/>' + caption;
 
                     // Set syules for <figure>
                     var figStyle = "text-align:center;";
