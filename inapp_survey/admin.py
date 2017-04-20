@@ -56,19 +56,58 @@ class CampaignAdmin(admin.ModelAdmin):
     form = CampaignForm
     list_display = (
         "__unicode__",
-        "created",
         "campaign_type",
+        "completed_count",
+        "canceled_count",
         "expiry_date",
         "is_authenticated",
     )
     inlines = [CampaignQuestionInline]
     prepopulated_fields = { "slug": ["title"] }
+    list_filter = (
+        "campaign_type",
+    )
+
+
+class UserCampaignResponseInline(admin.TabularInline):
+
+    model = UserCampaignResponse
+    fields = ('question', 'response',)
+    extra = 0
+
+
+class UserCampaignResponseAdmin(admin.ModelAdmin):
+
+    model = UserCampaignResponse
+    list_display = (
+        "__unicode__",
+        "response",
+        "created",
+    )
+    search_fields = (
+        "user_campaign__campaign__title",
+    )
+
+
+class UserCampaignAdmin(admin.ModelAdmin):
+
+    model = UserCampaign
+    list_display = (
+        "__unicode__",
+        "is_completed",
+        "is_canceled",
+    )
+    list_filter = (
+        "is_canceled",
+        "campaign__campaign_type",
+    )
+    inlines = [UserCampaignResponseInline]
 
 
 admin.site.register(Campaign, CampaignAdmin)
 admin.site.register(CampaignQuestion)
 admin.site.register(CampaignCustomParam)
-admin.site.register(UserCampaign)
-admin.site.register(UserCampaignResponse)
+admin.site.register(UserCampaign, UserCampaignAdmin)
+admin.site.register(UserCampaignResponse, UserCampaignResponseAdmin)
 
 

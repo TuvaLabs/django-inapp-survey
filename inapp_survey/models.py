@@ -66,6 +66,14 @@ class Campaign(TimeStampedModel):
         blank=True)
 
 
+    def completed_count(self):
+        return self.usercampaign_set.filter(
+            is_completed=True).count()
+
+    def canceled_count(self):
+        return self.usercampaign_set.filter(
+            is_canceled=True).count()
+
     def __unicode__(self):
         return u'%s' % (self.title)
 
