@@ -101,6 +101,10 @@ class UserCampaignAdmin(admin.ModelAdmin):
         "is_canceled",
         "campaign__campaign_type",
     )
+    search_fields = (
+        "campaign__title",
+        "user__username",
+    )
     inlines = [UserCampaignResponseInline]
 
 
