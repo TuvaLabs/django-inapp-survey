@@ -16,13 +16,22 @@
     function LocalStorageService() {
         this.storageKey = "surveyIds";
         this.getSurveyIds = function() {
-            var surveyIds = localStorage.getItem(this.storageKey);
-            return surveyIds? surveyIds.split(','): [];
+            try {
+                var surveyIds = localStorage.getItem(this.storageKey);
+                return surveyIds? surveyIds.split(','): [];
+            } catch(e) {
+                // Mute the exception when there are no localStorage feature available
+                return [];
+            }
         };
         this.addSurveyId = function(surveyId) {
-            var surveyIds = this.getSurveyIds();
-            surveyIds.push(surveyId);
-            localStorage.setItem(this.storageKey, surveyIds.join(','));
+            try {
+                var surveyIds = this.getSurveyIds();
+                surveyIds.push(surveyId);
+                localStorage.setItem(this.storageKey, surveyIds.join(','));
+            } catch(e) {
+                // Mute the exception when there are no localStorage feature available
+            }
         };
     }
 
@@ -369,8 +378,10 @@
                         }
                         inAppSurveyService.submitSurvey(data, function(result){
                             // TODO: Exception handeling
-                            announcement.remove();
+                            // announcement.remove();
                         });
+                        // Remove announcement as soon as the API request is submitted
+                        announcement.remove();
                     });
                 } else if(surveyObj.campaign_type === "survey" && isAuthenticated) {
                     var campaign = new InAppCampaign(surveyObj);
@@ -385,12 +396,18 @@
                         }
                         inAppSurveyService.submitSurvey(data, function(result){
                             // TODO: Exception handeling
-                            campaign.remove();
-                            if(isCompleted) {
-                                var inappSuccessEle = new InAppSuccess();
-                                inappSuccessEle.show();
-                            }
+                            // campaign.remove();
+                            // if(isCompleted) {
+                            //     var inappSuccessEle = new InAppSuccess();
+                            //     inappSuccessEle.show();
+                            // }
                         });
+                        // Remove campaign as soon as the API request is submitted
+                        campaign.remove();
+                        if(isCompleted) {
+                            var inappSuccessEle = new InAppSuccess();
+                            inappSuccessEle.show();
+                        }
                     });
                 }
             }
