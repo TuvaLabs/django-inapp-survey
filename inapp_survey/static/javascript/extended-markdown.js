@@ -229,25 +229,24 @@
                         caption += '<figcaption style="text-align:left;background-color:#494949;padding:5px 10px;color:#fff;margin-bottom:10px;">' + title + '</figcaption>';
                     }
 
-                    var html = '<img style="max-width: 100%;" src="' + imageUrl + '" alt="' + altText + '"';
+                    var html = '<img src="' + imageUrl + '" alt="' + altText + '"';
 
+                    html += ' style="max-width: 100%;';
                     if(width > 0 || height > 0) {
-                        html += 'style="';
                         html += ((width > 0) ? 'width:' + width  + 'px;' : "");
                         html += ((height > 0) ? 'height:' + height  + 'px;' : "");
                         // Set display block when the caption is available
                         if(caption) {
                             html += 'display:block;';
                         }
-                        html += '"';
                     }
 
-                    html += '/>' + caption;
+                    html += '"/>' + caption;
 
                     // Set syules for <figure>
                     var figStyle = "text-align:center;";
                     if(align) {
-                        figStyle += "float:" + align + ";margin-" + align + ":0;margin-" + (align==='left'?"right":"left") + ":5%;width:45%;overflow:hidden;";
+                        figStyle += "float:" + align + ";margin-" + align + ":0;margin-" + (align==='left'?"right":"left") + ":3em;overflow:hidden;";
                     } else {
                         if(width > 0) {
                             figStyle += "width:" + width + 'px;';
