@@ -15,6 +15,7 @@
     // Service for localStorage
     function LocalStorageService() {
         this.storageKey = "surveyIds";
+        this.timeoutMSKey = "surveyTimeoutMS";
         this.getSurveyIds = function() {
             try {
                 var surveyIds = localStorage.getItem(this.storageKey);
@@ -33,7 +34,39 @@
                 // Mute the exception when there are no localStorage feature available
             }
         };
+        this.getSurveyTimeoutMS = function() {
+            try {
+                var timeoutTime = localStorage.getItem(this.timeoutMSKey);
+                if(timeoutTime === null) {
+                    return 0;
+                } else {
+                    return parseInt(localStorage.getItem(this.timeoutMSKey));
+                }
+            } catch(e) {
+                // Mute the exception when there are no localStorage feature available
+                return 0;
+            }
+        }
+        this.setSurveyTimeoutMS = function(ms) {
+            try {
+                localStorage.setItem(this.timeoutMSKey, ms);
+            } catch(e) {
+                // Mute the exception when there are no localStorage feature available
+            }
+        }
+        this.isAvailable = function() {
+            try {
+                localStorage.setItem("test", "test");
+                localStorage.removeItem("test");
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
     }
+
+    // Initliaze localstorage object
+    var localStorageService = new LocalStorageService();
 
     // HTTP service for survey listing and posting
     function InAppSurveyService() {
@@ -57,7 +90,6 @@
             // TODO:
             // 1) Can we not use "inapp_survey" as hard coded value here, and make it dynamic
             // 2) Handle request failure or exceptions
-            var localStorageService = new LocalStorageService();
             jQuery.ajax({
                 url: "/inapp_survey/api/campaigns/",
                 type: 'POST',
@@ -382,6 +414,8 @@
                         });
                         // Remove announcement as soon as the API request is submitted
                         announcement.remove();
+                        // Initiate the next campaign timer
+                        resetTimer();
                     });
                 } else if(surveyObj.campaign_type === "survey" && isAuthenticated) {
                     var campaign = new InAppCampaign(surveyObj);
@@ -408,14 +442,47 @@
                             var inappSuccessEle = new InAppSuccess();
                             inappSuccessEle.show();
                         }
+                        // Initiate the next campaign timer
+                        resetTimer();
                     });
                 }
             }
         });
     }
 
-    // Start after timeout
-    setTimeout(function () {
-        initiateSurvey();
-    }, 800);
+    // Timer to handle the survey showup based on timeout
+    var TIME_TO_SHOW_CAMPAIGN = 300 * 1000; // 5 min;
+    var timerIntervel = 2000;
+    var isLocalStorageAvailable = localStorageService.isAvailable();
+    function intializeTimer() {
+        if(isLocalStorageAvailable) {
+            if(localStorageService.getSurveyTimeoutMS() === 0) {
+                localStorageService.setSurveyTimeoutMS(TIME_TO_SHOW_CAMPAIGN);
+            }
+            var timer = setInterval(function() {
+                var timeoutSec = localStorageService.getSurveyTimeoutMS();
+                timeoutSec -= timerIntervel;
+                if(timeoutSec <= 0) {
+                    // Clear the interval when there are no campaign
+                    clearInterval(timer);
+                    // Initialize the survey
+                    initiateSurvey();
+                    // Reset the time
+                    timeoutSec = -9999;
+                }
+                localStorageService.setSurveyTimeoutMS(timeoutSec);
+            }, timerIntervel);
+        } else {
+            initiateSurvey();
+        }
+    }
+
+    function resetTimer() {
+        // Initiate the next campaign timer
+        localStorageService.setSurveyTimeoutMS(TIME_TO_SHOW_CAMPAIGN);
+        intializeTimer();
+    }
+    // Intialize the timer after a sec
+    setTimeout(intializeTimer, 800);
+
 })(jQuery);
