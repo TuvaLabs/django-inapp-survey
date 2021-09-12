@@ -26,8 +26,8 @@ class CampaignCustomParam(TimeStampedModel):
         blank=False,
         max_length=1000)
 
-    def __unicode__(self):
-        return u'%s : %s' % (
+    def __str__(self):
+        return '%s : %s' % (
             self.param_key,
             self.param_value)
 
@@ -74,15 +74,15 @@ class Campaign(TimeStampedModel):
         return self.usercampaign_set.filter(
             is_canceled=True).count()
 
-    def __unicode__(self):
-        return u'%s' % (self.title)
+    def __str__(self):
+        return '%s' % (self.title)
 
 
 class CampaignQuestion(TimeStampedModel):
 
     campaign = models.ForeignKey(
         Campaign,
-        related_name="questions")
+        related_name="questions", on_delete=models.CASCADE)
     question = models.TextField(
         "question content",
         blank = False,
@@ -94,8 +94,8 @@ class CampaignQuestion(TimeStampedModel):
     class Meta:
         ordering = ("order",)
 
-    def __unicode__(self):
-        return u'%s-%s' % (
+    def __str__(self):
+        return '%s-%s' % (
             self.campaign,
             self.order)
 
@@ -103,27 +103,27 @@ class CampaignQuestion(TimeStampedModel):
 class UserCampaign(TimeStampedModel):
 
     user = models.ForeignKey(
-        User)
-    campaign = models.ForeignKey(Campaign)
+        User, on_delete=models.CASCADE)
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)
     is_canceled = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'%s-%s' % (
+    def __str__(self):
+        return '%s-%s' % (
             self.campaign,
             self.user)
 
 
 class UserCampaignResponse(TimeStampedModel):
 
-    user_campaign = models.ForeignKey(UserCampaign)
-    question = models.ForeignKey(CampaignQuestion)
+    user_campaign = models.ForeignKey(UserCampaign, on_delete=models.CASCADE)
+    question = models.ForeignKey(CampaignQuestion, on_delete=models.CASCADE)
     response = models.TextField(
         null=True,
         blank=True)
 
-    def __unicode__(self):
-        return u'%s-%s' % (
+    def __str__(self):
+        return '%s-%s' % (
             self.user_campaign,
             self.question)
 

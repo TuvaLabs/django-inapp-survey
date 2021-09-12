@@ -9,53 +9,37 @@ from .models import CampaignCustomParam, Campaign, CampaignQuestion, \
 
 # Widget to set markdown editor
 class MarkdownDelightEditorWidget(forms.TextInput):
-
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if value:
             tpl = Template(
-                u"""<markdown-delight-editor-extended name="$name">$value</markdown-delight-editor-extended>""")
+                u"""<markdown-delight-editor-extended name="$name"><textarea>$value</textarea></markdown-delight-editor-extended>"""
+            )
             return mark_safe(tpl.substitute(name=name, value=value))
         else:
             tpl = Template(
-                u"""<markdown-delight-editor-extended name="$name"></markdown-delight-editor-extended>""")
+                u"""<markdown-delight-editor-extended name="$name"><textarea></textarea></markdown-delight-editor-extended>"""
+            )
             return mark_safe(tpl.substitute(name=name))
-
-
-class CampaignForm(forms.ModelForm):
-
-    class Meta:
-        model = Campaign
-        fields = '__all__'
-        widgets = {
-            'description': MarkdownDelightEditorWidget(),
-        }
-
-
-class CampaignQuestionForm(forms.ModelForm):
-
-    class Meta:
-        model = CampaignQuestion
-        fields = '__all__'
-        widgets = {
-            'question': MarkdownDelightEditorWidget(),
-        }
 
 
 class CampaignQuestionInline(admin.TabularInline):
 
     model = CampaignQuestion
-    form = CampaignQuestionForm
     extra = 0
     ordering = ("order", )
     fields = ("order", "question", )
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == "question":
+            kwargs["widget"] = MarkdownDelightEditorWidget()
+        return super(CampaignQuestionInline, self).formfield_for_dbfield(db_field, **kwargs)
 
 
 class CampaignAdmin(admin.ModelAdmin):
 
     model = Campaign
-    form = CampaignForm
     list_display = (
-        "__unicode__",
+        "__str__",
         "campaign_type",
         "completed_count",
         "canceled_count",
@@ -67,6 +51,11 @@ class CampaignAdmin(admin.ModelAdmin):
     list_filter = (
         "campaign_type",
     )
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == "description":
+            kwargs["widget"] = MarkdownDelightEditorWidget()
+        return super(CampaignAdmin, self).formfield_for_dbfield(db_field, **kwargs)
 
 
 class UserCampaignResponseInline(admin.TabularInline):
@@ -80,7 +69,7 @@ class UserCampaignResponseAdmin(admin.ModelAdmin):
 
     model = UserCampaignResponse
     list_display = (
-        "__unicode__",
+        "__str__",
         "response",
         "created",
     )
@@ -93,7 +82,7 @@ class UserCampaignAdmin(admin.ModelAdmin):
 
     model = UserCampaign
     list_display = (
-        "__unicode__",
+        "__str__",
         "is_completed",
         "is_canceled",
     )

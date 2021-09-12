@@ -24,7 +24,7 @@ class ActiveCampaignList(views.APIView):
         campaign = Campaign.objects.filter(expiry_date__gt=datetime.now()).order_by('expiry_date')
 
         # check for is_authenticated
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
 
             exclude_responded = []
             for item in campaign:
@@ -39,13 +39,13 @@ class ActiveCampaignList(views.APIView):
             campaign = campaign.filter(is_authenticated=False)
             # If user is unauthenticated, also exclude the completed/canceled
             # campaigns passed by front end.
-            if request.data.has_key('completed_campaigns'):
+            if 'completed_campaigns' in request.data:
                 campaign = campaign.exclude(
                     id__in=request.data['completed_campaigns'])
 
         # check for custom_param filtering
         user_param = {}
-        if request.data.has_key('custom_params'):
+        if 'custom_params' in request.data:
             user_param = request.data['custom_params']
         filter_based_on_param = []
         for item in campaign:

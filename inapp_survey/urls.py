@@ -1,4 +1,5 @@
-from django.conf.urls import url, include
+from django.urls import path, include
+from django.urls.conf import re_path
 
 from . import views
 from inapp_survey.resources import ActiveCampaignList, ActiveCampaignDetails, \
@@ -6,20 +7,20 @@ from inapp_survey.resources import ActiveCampaignList, ActiveCampaignDetails, \
 
 urlpatterns = [
     # TODO: only return the relevent
-    url(r'^api/campaigns/$',
+    path('api/campaigns/',
         ActiveCampaignList.as_view(),
         name='active-campaign-list'),
-    url(r'^api/campaigns/(?P<slug>[0-9a-zA-Z_-]+)$',
+    re_path(r'^api/campaigns/(?P<slug>[0-9a-zA-Z_-]+)$',
         ActiveCampaignDetails.as_view(),
         name='active-campaign-details'),
-    url(r'^api/response/$',
+    path('api/response/',
         UserCampaignList.as_view(
             ), name='campaign-enroll-list'),
-    url(r'^api/response/(?P<pk>\d+)/$',
+    re_path(r'^api/response/(?P<pk>\d+)/$',
         UserCampaignDetail.as_view(
             ), name='campaign-enroll-details'),
 
-    url(r'^api-auth/', include('rest_framework.urls',
+    path('api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     # service for creating usercampaign
     # save the responses
