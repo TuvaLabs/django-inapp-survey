@@ -151,15 +151,18 @@
             });
 
             // Onclick callback
-            _announcementElement.click(function(){
+            _announcementElement.click(function(e){
                 if(_onClickCallBack) {
-                    _onClickCallBack();
+                    _onClickCallBack(e);
                 }
             });
         }
 
-        this.show = function(announcement) {
+        this.show = function(announcement, isStartAnnouncement = true) {
             _announcementTextHolder.html(convertMarkdownToHtml(announcement));
+            if(!isStartAnnouncement) {
+                _announcementElement.find('.footer').addClass('django-inapp-d-none')
+            }
             $('body').append(_announcementElement);
             _announcementElement.hide();
             _announcementElement.slideDown();
@@ -217,10 +220,12 @@
             _announcementEle.remove();
         });
 
-        _announcementEle.onClick(function(){
+        _announcementEle.onClick(function(e){
             // Expand the survey
-            _hideAnnouncement();
-            _showCampaign();
+            if(e.target.getAttribute('class') === "start-button"){
+               _hideAnnouncement();
+               _showCampaign();
+            }
         });
 
         function _showCampaign() {
@@ -256,6 +261,10 @@
                 {
                     if(!(_activeQuestionObject.type === 'checkbox' && dataArray.length && dataArray[0].value)) {
                         // Diallow unanswered questions
+                        const isErrorMessage = document.querySelector('.django-inapp-toast__wrap');
+                        if(!isErrorMessage){
+                            showToast()
+                        }
                         event.preventDefault();
                         return;
                     }
@@ -393,7 +402,7 @@
                 surveyObj = result;
                 if(surveyObj.campaign_type === "announcement") {
                     var announcement = new InAppAnnouncement();
-                    announcement.show(surveyObj.description);
+                    announcement.show(surveyObj.description, false);
                     announcement.onClose(function(){
                         if(!isAuthenticated) {
                             var localStorageService = new LocalStorageService()
@@ -481,6 +490,20 @@
         // Initiate the next campaign timer
         localStorageService.setSurveyTimeoutMS(TIME_TO_SHOW_CAMPAIGN);
         intializeTimer();
+    }
+
+    function showToast(){
+        const toastsContainer = document.querySelector('.django-inapp-toasts-container');
+        const toastElement = document.createElement('div');
+        toastElement.classList.add('django-inapp-toast', `django-inapp-toast--error`);
+        const toastWrap = document.createElement('div');
+        toastWrap.classList.add('django-inapp-toast__wrap');
+        toastWrap.innerHTML = 'Please Provide An Answer.';
+        toastElement.appendChild(toastWrap);
+        toastsContainer.appendChild(toastElement);
+        setTimeout(() =>{
+            toastElement.parentNode.removeChild(toastElement);
+        }, 2000);
     }
     // Intialize the timer after a sec
     setTimeout(intializeTimer, 800);

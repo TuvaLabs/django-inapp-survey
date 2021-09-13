@@ -1,89 +1,246 @@
 <style type="text/css">
-/* FOR OVERLAY ELEMENT */
-.django-inapp-survey-overlay {
-  background: #000;
-  opacity: 0.7;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  z-index: 10;
-  transition: all 200ms;
-}
 
-/* FOR ANNOUNCEMENT ELEMENT */
-.django-inapp-survey-wrapper {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 10px;
-  background: #fff;
-  border-top: 1px solid #ccc;
-  max-height: 50%;
-  overflow: auto;
-  z-index: 99;
-}
-.django-inapp-survey-announcement p {
-  margin: 0;
-}
-.django-inapp-survey-wrapper.campaign {
-    cursor: pointer;
-}
-.django-inapp-survey-wrapper.campaign a {
+  :root {
+    --django-inapp-toast-background: #cc1000;
+    --django-inapp-base-background: #8c1a64;
+    --django-inapp-toast-color: #fff;
+    --django-inapp-toast-offset: 100px;
+    --django-inapp-border-color: #fff;
+  }
+
+  /* FOR OVERLAY ELEMENT */
+  .django-inapp-survey-overlay {
+    background: #000;
+    opacity: 0.7;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 10;
+    transition: all 200ms;
+  }
+
+  /* FOR ANNOUNCEMENT ELEMENT */
+  .django-inapp-survey-wrapper {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+    max-height: 50%;
+    background-color: var(--django-inapp-base-background) !important;
+    box-shadow: 0px 0px 5px rgba(0, 68, 69, 0.3) !important;
+    z-index: 99999 !important;
+    color: #fff !important;
+    font-family: Montserrat !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    min-height: 63px;
+    overflow: auto !important;
+  }
+
+  .django-inapp-survey-wrapper h3 {
+    color: #ecb806 !important;
+    font-size: 20px !important;
+    line-height: 24px !important;
+    margin-bottom: 15px;
+  }
+
+  .django-inapp-survey-announcement p {
+    margin: 0;
+  }
+
+  .django-inapp-survey-wrapper.campaign a {
     pointer-events: none;
-}
-.django-inapp-survey-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 10px;
-  cursor: pointer;
-}
-.django-inapp-survey-announcement {
-  max-width: 1000px;
-  margin: auto;
-  text-align: center;
-}
-@media screen and (max-width: 1000px) {
-    .django-inapp-survey-announcement {
-        padding-right: 25px;
-    }
-}
+  }
 
-/* FOR CAMPAIGN ELEMENT */
-.django-inapp-survey-campaign {
+  .django-inapp-survey-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    margin: 15px !important;
+    border: 1px solid var(--django-inapp-border-color) !important;
+    border-radius: 4px;
+    padding: 5px 10px;
+  }
+
+  .django-inapp-survey-close:hover {
+    background:#fff;
+  }
+  .django-inapp-survey-close:hover i {
+      color: var(--django-inapp-base-background);
+    }
+
+  .django-inapp-survey-announcement {
+    max-width: 1000px;
+    margin: auto;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 1000px) {
+    .django-inapp-survey-announcement {
+      padding-right: 25px;
+    }
+  }
+
+  /* FOR CAMPAIGN ELEMENT */
+  .django-inapp-survey-campaign {
     box-sizing: border-box;
     max-width: 600px;
     margin: auto;
-    border: 1px solid #ccc;
     padding: 10px 20px;
     height: 100%;
     overflow: auto;
-}
-@media screen and (max-width: 600px) {
+  }
+
+  @media screen and (max-width: 600px) {
     .django-inapp-survey-campaign {
-        padding-right: 25px;
+      padding-right: 25px;
     }
+  }
+
+  .django-inapp-survey-campaign form input[type=text],
+  .django-inapp-survey-campaign form textarea {
+    width: 100%;
+    padding: 5px;
+    margin: 10px 0;
+    height: 44px;
+    outline: none;
+    border: none;
+    box-sizing: border-box;
+  }
+
+  .django-inapp-survey-campaign p {
+    margin-bottom: 0;
+  }
+
+  .django-inapp-survey-announcement+.footer {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .django-inapp-survey-campaign button,
+  .django-inapp-survey-announcement+.footer button {
+    padding: 8px 20px;
+    margin: 5px 10px;
+    text-align: center;
+    border: 2px solid var(--django-inapp-border-color);
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    background-color: transparent;
+    color: #fff;
+  }
+
+  .django-inapp-survey-campaign button:hover,
+  .django-inapp-survey-announcement+.footer button:hover {
+    background-color: #fff;
+    color: var(--django-inapp-base-background);
+    cursor: pointer;
+  }
+
+
+  .django-inapp-survey-campaign form ul.question-options {
+    list-style: none;
+    padding: 0;
+  }
+
+  .django-inapp-survey-campaign .footer .navigate-buttons,
+  .django-inapp-survey-announcement+.footer .navigate-buttons {
+    float: right;
+  }
+
+  .django-inapp-survey-campaign a,
+  .django-inapp-survey-wrapper a {
+    text-decoration: underline !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+  }
+
+  .django-inapp-survey-campaign a,
+  .django-inapp-survey-wrapper a {
+    text-decoration: underline !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+  }
+
+  .django-inapp-survey-campaign label,
+  .django-inapp-survey-wrapper label {
+    font-weight: 400 !important;
+  }
+
+  .django-inapp-survey-campaign footer,
+  .django-inapp-survey-wrapper footer {
+    background: transparent !important;
+
+  }
+
+  .django-inapp-survey-campaign form p,
+  .django-inapp-survey-wrapper form p {
+    font-weight: 700 !important;
+  }
+
+  /* FOR CAMPAIGN SUCCESS ELEMENT */
+  .django-inapp-survey-success {
+    font-size: 150px;
+    text-align: center;
+  }
+
+  .django-inapp-d-none{
+    display: none !important;
+  }
+
+
+  /*Toast message */
+
+.django-inapp-toasts-container {
+  position: fixed;
+  bottom: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 10000;
+
 }
-.django-inapp-survey-campaign form input[type=text], .django-inapp-survey-campaign form textarea {
-  width: 100%;
-  margin: 20px 0;
-  box-sizing: border-box;
+
+.django-inapp-toast {
+  position: relative;
+  transform: translateY(var(--django-inapp-toast-offset));
+  margin-bottom: 10px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
-.django-inapp-survey-campaign form ul.question-options {
-  list-style: none;
-  padding: 0;
+.django-inapp-toast__wrap {
+  padding: 10px;
+  background: var(--django-inapp-toast-background);
+  color: var(--django-inapp-toast-color);
 }
-.django-inapp-survey-campaign .footer .navigate-buttons {
-  float: right;
+.django-inapp-toast--error .django-inapp-toast__wrap {
+  background: var(--django-inapp-toast-background);
+  color: var(--django-inapp-toast-color);
+  font-size: 16px;
+  font-weight: 700;
 }
-/* FOR CAMPAIGN SUCCESS ELEMENT */
-.django-inapp-survey-success {
-  font-size: 150px;
-  text-align: center;
+
+@keyframes append-animate {
+	from {
+		transform: scaleY(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleY(1);
+		opacity: 1;
+	}
 }
+
+.django-inapp-toast__wrap {
+	transform-origin: 50% 0;
+	animation: append-animate .3s linear;
+}
+
+
 </style>
 <!-- Overlay Template -->
 <script id="django-inapp-survey-overlay-template" type="text/x-custom-template">
@@ -94,6 +251,11 @@
   <div class="django-inapp-survey-wrapper">
     <div class="django-inapp-survey-close"><i class="fa fa-close"></i></div>
     <div class="django-inapp-survey-announcement"></div>
+    <div class="footer">
+      <div class="navigate-buttons">
+        <button class="start-button">Start</button>
+      </div>
+    </div>
   </div>
 </script>
 <!-- Campaign Template -->
@@ -104,6 +266,7 @@
       <form class="django-inapp-survey-campaign-form">
       </form>
       <div class="footer">
+        <div class="django-inapp-toasts-container"></div>
         <span class="step-progress">Step <span class="current-step"></span> of <span class="total-step"></span></span>
         <div class="navigate-buttons">
           <button class="previous-button">Previous</button>
@@ -130,6 +293,16 @@
       isAuthenticated: '{{user.is_authenticated|yesno}}'==='yes'
   };
 </script>
+<script>
+  // To check background MATCH
+  setInterval(
+    function () {
+      var randomColor = Math.floor(Math.random() * 16777215).toString(16);
+      document.body.style.backgroundColor = "#" + randomColor;
+    }, 1000);
+
+</script>
+
 <link rel="stylesheet" href="/static/bower_components/components-font-awesome/css/font-awesome.min.css"></link>
 <script>window.showdown || document.write('<script src="/static/bower_components/showdown/dist/showdown.min.js">\x3C/script>');</script>
 <script src="/static/javascript/extended-markdown.js"></script>
