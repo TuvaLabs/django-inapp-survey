@@ -1,4 +1,4 @@
-Django==1.9.9
+Django==2.2.24
 djangorestframework==3.4.6
 django-extensions==1.6.7
 mysql-python
