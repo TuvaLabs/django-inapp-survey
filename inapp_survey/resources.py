@@ -50,7 +50,7 @@ class ActiveCampaignList(views.APIView):
         filter_based_on_param = []
         for item in campaign:
             for param in item.custom_param.all():
-                if user_param.has_key(param.param_key) and user_param[param.param_key] in param.param_value:
+                if param.param_key in user_param and user_param[param.param_key] in param.param_value:
                     pass
                 else:
                     filter_based_on_param.append(item.id)
