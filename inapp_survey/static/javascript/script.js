@@ -408,6 +408,7 @@
                             var localStorageService = new LocalStorageService()
                             localStorageService.addSurveyId(surveyObj.id);
                             announcement.remove();
+                            resetTimer();
                             return;
                         }
                         var data = {
@@ -454,6 +455,8 @@
                         // Initiate the next campaign timer
                         resetTimer();
                     });
+                } else {
+                    resetTimer(true);
                 }
             }
         });
@@ -486,10 +489,12 @@
         }
     }
 
-    function resetTimer() {
+    function resetTimer(isNoCampaign = false) {
         // Initiate the next campaign timer
         localStorageService.setSurveyTimeoutMS(TIME_TO_SHOW_CAMPAIGN);
-        intializeTimer();
+        if(!isNoCampaign){
+            intializeTimer();
+        }
     }
 
     function showToast(){
