@@ -407,24 +407,23 @@
                         if(!isAuthenticated) {
                             var localStorageService = new LocalStorageService()
                             localStorageService.addSurveyId(surveyObj.id);
-                            announcement.remove();
-                            return;
+                        } else {
+                            var data = {
+                                "user": userId,
+                                "campaign": surveyObj.id,
+                                "is_completed": true,
+                                "is_canceled": false,
+                                "answers": []
+                            }
+                            inAppSurveyService.submitSurvey(data, function(result){
+                                // TODO: Exception handeling
+                                // announcement.remove();
+                            });
                         }
-                        var data = {
-                            "user": userId,
-                            "campaign": surveyObj.id,
-                            "is_completed": true,
-                            "is_canceled": false,
-                            "answers": []
-                        }
-                        inAppSurveyService.submitSurvey(data, function(result){
-                            // TODO: Exception handeling
-                            // announcement.remove();
-                        });
-                        // Remove announcement as soon as the API request is submitted
+                        // Remove announcement
                         announcement.remove();
                         // Initiate the next campaign timer
-                        resetTimer();
+                        resetTimer(false);
                     });
                 } else if(surveyObj.campaign_type === "survey" && isAuthenticated) {
                     var campaign = new InAppCampaign(surveyObj);
@@ -452,8 +451,11 @@
                             inappSuccessEle.show();
                         }
                         // Initiate the next campaign timer
-                        resetTimer();
+                        resetTimer(false);
                     });
+                } else {
+                    // Reset campaign timer when there are no campaign
+                    resetTimer(true);
                 }
             }
         });
@@ -486,10 +488,13 @@
         }
     }
 
-    function resetTimer() {
+    function resetTimer(isNoCampaign) {
         // Initiate the next campaign timer
         localStorageService.setSurveyTimeoutMS(TIME_TO_SHOW_CAMPAIGN);
-        intializeTimer();
+        // Don't start timer when there are no campaign
+        if(!isNoCampaign) {
+            intializeTimer();
+        }
     }
 
     function showToast(){
