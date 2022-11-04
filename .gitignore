@@ -91,3 +91,5 @@ survey/
 
 # Rope project settings
 .ropeproject
+
+node_modules
