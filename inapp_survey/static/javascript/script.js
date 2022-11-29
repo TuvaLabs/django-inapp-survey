@@ -158,7 +158,10 @@
             });
         }
 
-        this.show = function(announcement, isStartAnnouncement = true) {
+        this.show = function(announcement, isStartAnnouncement) {
+            if(isStartAnnouncement !== false) {
+                isStartAnnouncement = true;
+            }
             _announcementTextHolder.html(convertMarkdownToHtml(announcement));
             if(!isStartAnnouncement) {
                 _announcementElement.find('.footer').addClass('django-inapp-d-none')
