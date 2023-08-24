@@ -119,7 +119,7 @@
     function InAppOverlay () {
         var _overlayElement = $($('#django-inapp-survey-overlay-template').html());
         this.show = function() {
-            $('body').append(_overlayElement);
+            $('html > body').append(_overlayElement);
             // For animation
             _overlayElement.hide();
             _overlayElement.fadeIn();
@@ -166,7 +166,7 @@
             if(!isStartAnnouncement) {
                 _announcementElement.find('.footer').addClass('django-inapp-d-none')
             }
-            $('body').append(_announcementElement);
+            $('html > body').append(_announcementElement);
             _announcementElement.hide();
             _announcementElement.slideDown();
             _setupevents();
@@ -235,7 +235,7 @@
             // To show overlay
             _inAppOverlayEle.show();
 
-            $('body').append(_campaignElement);
+            $('html > body').append(_campaignElement);
             // For Animation
             _campaignElement.hide();
             _campaignElement.fadeIn();
@@ -377,7 +377,7 @@
         // $.parseHTML('<div class="django-inapp-survey-overlay"></div>');
         this.show = function() {
             _inAppOverlayEle.show();
-            $('body').append(_successElement);
+            $('html > body').append(_successElement);
             // For Animation
             _successElement.hide();
             _successElement.slideDown();
