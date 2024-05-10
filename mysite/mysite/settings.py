@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'inapp_survey',
 ]
 
@@ -82,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'survey',
         'USER': 'root',
-        'PASSWORD': 'local',
+        'PASSWORD': 'root',
         'HOST': '',
         'PORT': '',
 

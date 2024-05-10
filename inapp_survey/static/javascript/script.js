@@ -394,7 +394,7 @@
         };
     }
 
-    function initiateSurvey() {
+    function initiateSurvey(showOnlyHighPriority) {
         var inAppSurveyService = new InAppSurveyService(),
         customParams = inappSurveyParams.customParams,
         userId = inappSurveyParams.userId,
@@ -403,6 +403,13 @@
         inAppSurveyService.getSurvey(customParams, function(result){
             if(result) {
                 surveyObj = result;
+                // Show only high priority survey when showOnlyHighPriority is true
+                if(showOnlyHighPriority) {
+                    if(surveyObj.priority !== "high") {
+                        resetTimer(false);
+                        return;
+                    }
+                }
                 if(surveyObj.campaign_type === "announcement") {
                     var announcement = new InAppAnnouncement();
                     announcement.show(surveyObj.description, false);
@@ -465,7 +472,7 @@
     }
 
     // Timer to handle the survey showup based on timeout
-    var TIME_TO_SHOW_CAMPAIGN = 300 * 1000; // 5 min;
+    var TIME_TO_SHOW_CAMPAIGN = 5 * 60 * 1000; // 5 min;
     var timerIntervel = 2000;
     var isLocalStorageAvailable = localStorageService.isAvailable();
     function intializeTimer() {
@@ -480,14 +487,14 @@
                     // Clear the interval when there are no campaign
                     clearInterval(timer);
                     // Initialize the survey
-                    initiateSurvey();
+                    initiateSurvey(false);
                     // Reset the time
                     timeoutSec = -9999;
                 }
                 localStorageService.setSurveyTimeoutMS(timeoutSec);
             }, timerIntervel);
         } else {
-            initiateSurvey();
+            initiateSurvey(false);
         }
     }
 
@@ -513,7 +520,10 @@
             toastElement.parentNode.removeChild(toastElement);
         }, 2000);
     }
-    // Intialize the timer after a sec
-    setTimeout(intializeTimer, 800);
+    // Check for survey after a second
+    setTimeout(function(){
+        // Check for high priority surveys, if yes display it instantly
+        initiateSurvey(true);
+    }, 1000);
 
 })(jQuery);

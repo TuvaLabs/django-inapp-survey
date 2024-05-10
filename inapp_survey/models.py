@@ -10,6 +10,11 @@ CAMPAIGN_TYPE = (
     ('survey', 'Survey'),
 )
 
+CAMPAIGN_PRIORITY = (
+    ('normal', 'Normal'),
+    ('high', 'High'),
+)
+
 
 class CampaignCustomParam(TimeStampedModel):
     # example
@@ -59,7 +64,12 @@ class Campaign(TimeStampedModel):
         "Campaign Type",
         choices=CAMPAIGN_TYPE,
         max_length=500,
-        default="Request A Demo")
+        default="announcement")
+    priority = models.CharField(
+        "Priority",
+        choices=CAMPAIGN_PRIORITY,
+        max_length=10,
+        default="normal")
     custom_param = models.ManyToManyField(
         CampaignCustomParam,
         related_name="params",

@@ -60,6 +60,7 @@ class CampaignSerializer(serializers.ModelSerializer):
                 'is_authenticated',
                 'expiry_date',
                 'campaign_type',
+                'priority',
                 'steps',
                 'custom_param'
             )

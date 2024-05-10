@@ -20,8 +20,8 @@ class ActiveCampaignList(views.APIView):
 
     def post(self, request, *args, **kwargs):
 
-        # If its expired, don't return
-        campaign = Campaign.objects.filter(expiry_date__gt=datetime.now()).order_by('expiry_date')
+        # If its expired, don't return and give preference to high priority campaigns/survey
+        campaign = Campaign.objects.filter(expiry_date__gte=datetime.now().date()).order_by('priority', 'expiry_date')
 
         # check for is_authenticated
         if request.user.is_authenticated:
