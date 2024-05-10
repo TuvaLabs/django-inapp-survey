@@ -69,7 +69,8 @@ class Campaign(TimeStampedModel):
         "Priority",
         choices=CAMPAIGN_PRIORITY,
         max_length=10,
-        default="normal")
+        default="normal",
+        help_text="Note: Normal Priority will show the campaign after 5 minutes. High priority will show the campaign immediately.")
     custom_param = models.ManyToManyField(
         CampaignCustomParam,
         related_name="params",
