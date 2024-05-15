@@ -58,7 +58,7 @@ class Campaign(TimeStampedModel):
     is_authenticated = models.BooleanField(default=True)
     expiry_date = models.DateField(
         "Expiry",
-        blank=True,
+        blank=False,
         null=True)
     campaign_type = models.CharField(
         "Campaign Type",
