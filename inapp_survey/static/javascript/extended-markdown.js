@@ -6,6 +6,13 @@
 (function () {
     'use strict';
 
+    // showdown is loaded separately (see inapp_survey/index.html) and can
+    // intermittently fail to load. Bail out instead of throwing an uncaught
+    // ReferenceError when it isn't there.
+    if (typeof showdown === 'undefined') {
+        return;
+    }
+
     // Enable support to add Tables
     showdown.setOption('tables', true);
     showdown.setOption('strikethrough', true);

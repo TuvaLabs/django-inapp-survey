@@ -7,9 +7,29 @@
     }
 
     // For makrdown conversion
-    var _markdownConverter = new showdown.Converter({extensions: ['inapp-survey-extended']});
+    // showdown is loaded separately (see inapp_survey/index.html) and can
+    // intermittently fail to load, so build the converter lazily and degrade to
+    // the raw text instead of throwing an uncaught ReferenceError.
+    var _markdownConverter = null;
+    function getMarkdownConverter() {
+        if(_markdownConverter) {
+            return _markdownConverter;
+        }
+        var options = {};
+        try {
+            showdown.extension('inapp-survey-extended'); // throws if the extension isn't registered
+            options.extensions = ['inapp-survey-extended'];
+        } catch(e) {
+            // extended-markdown.js unavailable - fall back to plain markdown conversion.
+        }
+        _markdownConverter = new showdown.Converter(options);
+        return _markdownConverter;
+    }
     function convertMarkdownToHtml(markdownText) {
-        return _markdownConverter.makeHtml(markdownText);
+        if(typeof showdown === 'undefined') {
+            return markdownText;
+        }
+        return getMarkdownConverter().makeHtml(markdownText);
     }
 
     // Service for localStorage
